@@ -1,0 +1,71 @@
+.admin-dashboard {
+    padding: 20px;
+}
+
+.admin-tabs {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.admin-tabs button {
+    padding: 10px 20px;
+    border: none;
+    background: #eee;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.admin-tabs button.active {
+    background: black;
+    color: white;
+}
+
+.add-product-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+    margin-bottom: 40px;
+    padding: 20px;
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 8px;
+}
+
+.add-product-form input,
+.add-product-form textarea {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.add-product-form button {
+    background: black;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.admin-product-item,
+.admin-order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: white;
+    border-bottom: 1px solid #eee;
+}
+
+.order-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.order-actions button {
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+}

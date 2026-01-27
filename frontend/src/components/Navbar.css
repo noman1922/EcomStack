@@ -1,0 +1,167 @@
+.navbar {
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    height: 80px;
+    position: relative;
+    z-index: 100;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #111;
+    margin-right: 40px;
+}
+
+.search-container {
+    flex: 1;
+    max-width: 600px;
+}
+
+.search {
+    width: 100%;
+    padding: 12px 20px;
+    border-radius: 4px;
+    border: 1px solid #f0f0f0;
+    background: #fdfdfd;
+}
+
+.nav-actions {
+    display: flex;
+    gap: 30px;
+    margin-left: auto;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #111;
+    cursor: pointer;
+    text-decoration: none;
+    position: relative;
+    gap: 4px;
+}
+
+.nav-item span {
+    margin-top: 2px;
+}
+
+/* PROFILE DROPDOWN */
+.profile-container {
+    padding-bottom: 0;
+    position: relative;
+    /* Ensure container is relative for absolute dropdown */
+}
+
+.profile-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: -20px;
+    width: 250px;
+    background: white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    z-index: 1000;
+    cursor: default;
+
+    /* Animation for smooth entrance */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+}
+
+/* Show dropdown on hover */
+.profile-container:hover .profile-dropdown {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Add a transparent bridge specifically if needed, 
+   but simplistic hover usually works if no gap. 
+   Checking padding... .navbar is 80px height. */
+top: 100%;
+right: -20px;
+width: 250px;
+background: white;
+box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+padding: 20px;
+z-index: 1000;
+cursor: default;
+}
+
+.dropdown-header {
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+
+.dropdown-header p {
+    font-size: 13px;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.auth-links {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.auth-links a {
+    color: #ff3f6c;
+    text-decoration: none;
+}
+
+.divider {
+    color: #333;
+    margin: 0 5px;
+}
+
+.auth-status .username {
+    font-weight: 700;
+    font-size: 16px;
+    color: #111;
+}
+
+.dropdown-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.dropdown-menu li {
+    margin-bottom: 12px;
+}
+
+.dropdown-menu a {
+    text-decoration: none;
+    color: #555;
+    font-size: 14px;
+    transition: color 0.2s;
+}
+
+.dropdown-menu a:hover {
+    color: #111;
+    font-weight: 600;
+}
+
+.logout-item {
+    color: #e11d48;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.logout-item:hover {
+    font-weight: 600;
+}

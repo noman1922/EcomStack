@@ -1,0 +1,62 @@
+.home {
+    background: #ffffff;
+}
+
+/* HERO */
+.hero {
+    height: 420px;
+    background: url("https://images.unsplash.com/photo-1521335629791-ce4aec67dd47");
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.hero-content {
+    position: relative;
+    color: white;
+    padding: 120px 60px;
+    max-width: 600px;
+}
+
+.hero h1 {
+    font-size: 54px;
+    margin-bottom: 10px;
+}
+
+.hero p {
+    font-size: 18px;
+    margin-bottom: 25px;
+}
+
+.hero button {
+    padding: 12px 28px;
+    border: none;
+    background: #fff;
+    color: #111;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* PRODUCTS */
+.products {
+    padding: 60px;
+}
+
+.products h2 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 30px;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+}
