@@ -13,50 +13,65 @@ const Login = () => {
     const handleSubmit = async e => {
         e.preventDefault();
         try {
-            await login(email, password);
-            navigate('/');
+            const user = await login(email, password);
+            if (user?.role === 'admin') {
+                navigate('/admin');
+            } else {
+                navigate('/');
+            }
         } catch {
             setError('Invalid credentials');
         }
     };
 
     return (
-
         <div className="auth-container">
-            <form className="auth-page" onSubmit={handleSubmit}>
-                <h2>Welcome Back</h2>
+            <div className="auth-page">
+                <h2>LOGIN</h2>
 
-                {error && <p className="error">{error}</p>}
+                <div className="social-login">
+                    <button className="social-button">
+                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="social-icon" />
+                        <span>Google</span>
+                    </button>
+                    <button className="social-button">
+                        <img src="https://www.svgrepo.com/show/303125/apple-logo.svg" alt="Apple" className="social-icon" />
+                        <span>Apple</span>
+                    </button>
+                </div>
 
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    required
-                />
+                <div className="separator">
+                    <span>or</span>
+                </div>
 
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    required
-                />
+                <form onSubmit={handleSubmit}>
+                    {error && <p className="error">{error}</p>}
 
-                <button type="submit">Sign In</button>
+                    <input
+                        type="email"
+                        placeholder="Email Address"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        required
+                    />
 
-                <p>
-                    New here? <Link to="/register">Create account</Link>
-                </p>
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        required
+                    />
+
+                    <button type="submit">Sign In</button>
+                </form>
 
                 <p className="toggle-link" onClick={() => navigate('/register')}>
-                    Or create an account
+                    New here? Create account
                 </p>
-            </form>
+            </div>
         </div>
     );
-
 };
 
 export default Login;

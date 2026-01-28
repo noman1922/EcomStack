@@ -17,11 +17,11 @@ const ProductCard = ({ product, onAddToCart }) => {
             <div className="price">
                 {product.discount_price ? (
                     <>
-                        <span className="new">${product.discount_price}</span>
-                        <span className="old">${product.price}</span>
+                        <span className="new">{product.discount_price}tk</span>
+                        <span className="old">{product.price}tk</span>
                     </>
                 ) : (
-                    <span className="new">${product.price}</span>
+                    <span className="new">{product.price}tk</span>
                 )}
             </div>
 

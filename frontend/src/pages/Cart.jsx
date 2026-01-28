@@ -1,9 +1,21 @@
 import './Cart.css';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { useEffect } from 'react';
 
 const Cart = () => {
     const { cart, removeFromCart } = useCart();
+    const { user, loading: authLoading } = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!authLoading && user?.role === 'admin') {
+            navigate('/admin');
+        }
+    }, [user, authLoading]);
+
+    if (authLoading) return <div className="loading-state">Loading...</div>;
 
     if (cart.length === 0) {
         return (
@@ -23,7 +35,7 @@ const Cart = () => {
                     <img src={item.image} alt={item.name} />
                     <div className="cart-info">
                         <h4>{item.name}</h4>
-                        <p>${item.price}</p>
+                        <p>{item.price}tk</p>
                     </div>
                     <button onClick={() => removeFromCart(item._id)}>Remove</button>
                 </div>

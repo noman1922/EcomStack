@@ -25,23 +25,63 @@ const Register = () => {
     };
 
     return (
-        <div className="auth-page">
-            <form className="auth-box" onSubmit={handleSubmit}>
-                <h2>Create Account</h2>
+        <div className="auth-container">
+            <div className="auth-page">
+                <h2>CREATE ACCOUNT</h2>
 
-                {error && <p className="error">{error}</p>}
+                <div className="social-login">
+                    <button className="social-button">
+                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="social-icon" />
+                        <span>Google</span>
+                    </button>
+                    <button className="social-button">
+                        <img src="https://www.svgrepo.com/show/303125/apple-logo.svg" alt="Apple" className="social-icon" />
+                        <span>Apple</span>
+                    </button>
+                </div>
 
-                <input placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} />
-                <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-                <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
-                <input type="password" placeholder="Confirm Password" value={confirm} onChange={e => setConfirm(e.target.value)} />
+                <div className="separator">
+                    <span>or</span>
+                </div>
 
-                <button>Create Account</button>
+                <form onSubmit={handleSubmit}>
+                    {error && <p className="error">{error}</p>}
 
-                <p>
-                    Already have account? <Link to="/login">Sign in</Link>
+                    <input
+                        placeholder="Full Name"
+                        value={name}
+                        onChange={e => setName(e.target.value)}
+                        required
+                    />
+                    <input
+                        type="email"
+                        placeholder="Email Address"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        required
+                    />
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        required
+                    />
+                    <input
+                        type="password"
+                        placeholder="Confirm Password"
+                        value={confirm}
+                        onChange={e => setConfirm(e.target.value)}
+                        required
+                    />
+
+                    <button type="submit">Create Account</button>
+                </form>
+
+                <p className="toggle-link" onClick={() => navigate('/login')}>
+                    Already have an account? Sign In
                 </p>
-            </form>
+            </div>
         </div>
     );
 };

@@ -24,13 +24,25 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         const res = await api.post('/login', { email, password });
-        // Token is now in HttpOnly cookie
         setUser(res.data.user);
+        syncPendingCart();
+        return res.data.user;
     };
 
     const register = async (data) => {
         const res = await api.post('/register', data);
         setUser(res.data.user);
+        syncPendingCart();
+        return res.data.user;
+    };
+
+    const syncPendingCart = () => {
+        const pendingItem = sessionStorage.getItem('pendingCartItem');
+        if (pendingItem) {
+            // This will be handled by the CartContext which listens to user changes
+            // or we can trigger a manual sync if needed.
+            sessionStorage.removeItem('pendingCartItem');
+        }
     };
 
     const logout = async () => {

@@ -1,18 +1,11 @@
 import './CategoryTabs.css';
 
-const CategoryTabs = ({ selectedCategory, onSelectCategory }) => {
-    const categories = [
-        "All",
-        "Men's Fashion",
-        "Women's Fashion",
-        "Electronics",
-        "Accessories",
-        "Home & Lifestyle"
-    ];
+const CategoryTabs = ({ categories, selectedCategory, onSelectCategory }) => {
+    const allCategories = ["All", ...categories.map(c => c.name)];
 
     return (
         <div className="category-tabs">
-            {categories.map((cat, index) => (
+            {allCategories.map((cat, index) => (
                 <button
                     key={index}
                     className={selectedCategory === cat ? 'active' : ''}

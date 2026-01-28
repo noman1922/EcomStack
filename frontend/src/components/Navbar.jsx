@@ -1,13 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { User, ShoppingBag, Heart, MapPin } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+import { User, ShoppingBag, Heart, MapPin, Sun, Moon } from 'lucide-react';
 import './Navbar.css';
 
 const Navbar = () => {
     const { user, logout } = useAuth();
+    const { theme, toggleTheme } = useTheme();
     const [searchTerm, setSearchTerm] = useState('');
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const dropdownRef = useRef(null);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsProfileOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     const handleSearch = (e) => {
         if (e.key === 'Enter') {
@@ -17,7 +31,7 @@ const Navbar = () => {
 
     return (
         <nav className="navbar">
-            <Link to="/" className="logo">EcommercePro</Link>
+            <Link to="/" className="logo">EcomStack</Link>
 
             <div className="nav-links-left">
                 {/* Optional left links if needed */}
@@ -35,12 +49,21 @@ const Navbar = () => {
             </div>
 
             <div className="nav-actions">
+                <div className="nav-item" onClick={toggleTheme} style={{ width: '40px', alignItems: 'center' }}>
+                    {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+                    <span>{theme === 'light' ? 'Dark' : 'Light'}</span>
+                </div>
+
                 <div className="nav-item">
                     <MapPin size={20} />
                     <span>Stores</span>
                 </div>
 
-                <div className="nav-item profile-container">
+                <div
+                    className={`nav-item profile-container ${isProfileOpen ? 'active' : ''}`}
+                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                    ref={dropdownRef}
+                >
                     <User size={20} />
                     <span>Profile</span>
 
@@ -61,11 +84,19 @@ const Navbar = () => {
                         </div>
 
                         <ul className="dropdown-menu">
+                            {user && user.role === 'admin' && (
+                                <li className="admin-link"><Link to="/admin">Admin Dashboard</Link></li>
+                            )}
+                            {user && (
+                                <li><Link to="/profile">View Profile</Link></li>
+                            )}
                             <li><Link to="/orders">Track Order</Link></li>
-                            <li><Link to="/corporate">Corporate Sales</Link></li>
                             <li><Link to="/about">About Us</Link></li>
                             {user && (
-                                <li className="logout-item" onClick={logout}>
+                                <li className="logout-item" onClick={(e) => {
+                                    e.stopPropagation();
+                                    logout();
+                                }}>
                                     Logout
                                 </li>
                             )}

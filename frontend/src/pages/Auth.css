@@ -1,49 +1,167 @@
+/* CSS for Authentication Pages */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 160px);
+    width: 100%;
+}
+
 .auth-page {
-    max-width: 420px;
-    margin: 80px auto;
-    padding: 30px;
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 480px;
+    width: 90%;
+    margin: 40px auto;
+    padding: 40px;
+    background: var(--surface);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     text-align: center;
-    border: 1px solid #e5e5e5;
+    border: 1px solid var(--border);
+    box-sizing: border-box;
 }
 
 .auth-page h2 {
-    margin-bottom: 20px;
-    font-size: 26px;
-    color: #111;
+    margin-bottom: 30px;
+    font-size: 28px;
+    color: var(--text);
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* SOCIAL LOGIN */
+.social-login {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.social-button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--text);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.social-button:hover {
+    background: var(--border);
+    transform: translateY(-1px);
+}
+
+.social-icon {
+    width: 22px;
+    height: 22px;
+}
+
+/* SEPARATOR */
+.separator {
+    position: relative;
+    margin: 30px 0;
+    text-align: center;
+}
+
+.separator::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border);
+    z-index: 1;
+}
+
+.separator span {
+    position: relative;
+    z-index: 2;
+    background: var(--surface);
+    padding: 0 15px;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+/* FORM STYLES */
+.auth-page form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    /* Space between inputs */
+    box-sizing: border-box;
 }
 
 .auth-page input {
     width: 100%;
-    padding: 12px;
-    margin-bottom: 14px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    font-size: 15px;
-    background: #fff;
-    color: #111;
-}
-
-.auth-page button {
-    width: 100%;
-    padding: 12px;
-    background: #000000;
-    color: white;
-    border: none;
-    border-radius: 8px;
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
     font-size: 16px;
-    cursor: pointer;
+    background: var(--bg);
+    color: var(--text);
+    box-sizing: border-box;
+    /* Crucial for alignment */
+    display: block;
+    margin-bottom: 5px;
+    /* Slight gap between inputs */
 }
 
-.auth-page button:hover {
-    background: #000000;
+.auth-page input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+}
+
+.auth-page button[type="submit"] {
+    width: 100%;
+    padding: 16px;
+    background: #e8eaed;
+    /* Light gray from image */
+    color: #000000;
+    /* Black text from image */
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.auth-page button[type="submit"]:hover {
+    background: #d1d5db;
+    transform: translateY(-1px);
 }
 
 .auth-page .toggle-link {
-    margin-top: 16px;
-    font-size: 14px;
+    margin-top: 25px;
+    font-size: 15px;
     color: #2563eb;
     cursor: pointer;
+    text-decoration: none;
+    display: block;
+    font-weight: 500;
+}
+
+.auth-page .toggle-link:hover {
+    text-decoration: underline;
+}
+
+.error {
+    color: #ef4444;
+    font-size: 14px;
+    margin-bottom: 15px;
+    text-align: center;
 }

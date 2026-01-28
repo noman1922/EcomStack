@@ -56,10 +56,13 @@ class OrderController extends Controller
         $order = Order::create([
             'user_id' => $request->user()->id,
             'items' => $request->items,
+            'subtotal' => $request->subtotal,
+            'delivery_charge' => $request->delivery_charge,
             'total_amount' => $request->total_amount,
             'shipping_address' => $request->shipping_address,
             'payment_method' => $request->payment_method,
-            'payment_status' => $request->payment_method === 'cod' ? 'pending' : 'paid', // Simulating successful stripe
+            'payment_id' => $request->payment_id,
+            'payment_status' => $request->payment_status ?? 'pending',
             'order_status' => 'pending',
             'tracking_id' => $trackingId,
         ]);
@@ -69,7 +72,16 @@ class OrderController extends Controller
 
     public function show(string $id)
     {
-        return Order::findOrFail($id);
+        $order = Order::where('tracking_id', $id)
+                    ->orWhere('_id', $id)
+                    ->orWhere('id', $id)
+                    ->first();
+        
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+        
+        return $order;
     }
 
     public function updateStatus(Request $request, string $id)

@@ -11,6 +11,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
 Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index']);
+Route::get('/orders/{id}', [OrderController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -24,6 +25,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders', [OrderController::class, 'store']);
-    Route::get('/orders/{id}', [OrderController::class, 'show']);
     Route::put('/orders/{id}/status', [OrderController::class, 'updateStatus']);
+
+    Route::post('/categories', [App\Http\Controllers\CategoryController::class, 'store']);
+    Route::delete('/categories/{id}', [App\Http\Controllers\CategoryController::class, 'destroy']);
+    
+    // Stripe Routes
+    Route::post('/create-payment-intent', [\App\Http\Controllers\PaymentController::class, 'createPaymentIntent']);
 });

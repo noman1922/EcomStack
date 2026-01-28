@@ -1,10 +1,6 @@
-.home {
-    background: #ffffff;
-}
-
 /* HERO */
 .hero {
-    height: 420px;
+    height: 600px;
     background: url("https://images.unsplash.com/photo-1521335629791-ce4aec67dd47");
     background-size: cover;
     background-position: center;
@@ -21,8 +17,8 @@
 .hero-content {
     position: relative;
     color: white;
-    padding: 120px 60px;
-    max-width: 600px;
+    padding: 240px 120px;
+    max-width: 1000px;
 }
 
 .hero h1 {
@@ -46,7 +42,7 @@
 
 /* PRODUCTS */
 .products {
-    padding: 60px;
+    padding: 40px 0;
 }
 
 .products h2 {

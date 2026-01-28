@@ -1,9 +1,10 @@
 .product-card {
-    background: white;
+    background: var(--surface);
     border-radius: 10px;
     padding: 12px;
     text-align: center;
     transition: transform 0.2s ease;
+    border: 1px solid var(--border);
 }
 
 .product-card:hover {
@@ -23,7 +24,7 @@
     position: absolute;
     top: 10px;
     left: 10px;
-    background: #ff3d57;
+    background: var(--secondary);
     color: white;
     font-size: 12px;
     padding: 4px 8px;
@@ -33,6 +34,7 @@
 .product-card h3 {
     font-size: 15px;
     margin: 10px 0;
+    color: var(--text);
 }
 
 .price {
@@ -44,19 +46,20 @@
 
 .price .new {
     font-weight: bold;
+    color: var(--text);
 }
 
 .price .old {
     text-decoration: line-through;
-    color: #888;
+    color: var(--text-muted);
 }
 
 .add-cart {
     width: 100%;
     padding: 8px;
     border: none;
-    background: #111;
-    color: white;
+    background: var(--text);
+    color: var(--bg);
     cursor: pointer;
     border-radius: 20px;
 }

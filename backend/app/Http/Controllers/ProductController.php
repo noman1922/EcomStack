@@ -73,9 +73,14 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric',
-            'stock' => 'required|integer',
+            'stock' => 'nullable|integer',
+            'category' => 'nullable|string',
             'image' => 'nullable|string',
         ]);
+
+        if (!isset($validated['stock'])) {
+            $validated['stock'] = 99; // Default stock
+        }
 
         return Product::create($validated);
     }

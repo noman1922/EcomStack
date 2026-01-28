@@ -1,7 +1,8 @@
 .footer {
-    background: #2f2f2f;
-    color: #ddd;
+    background: var(--surface);
+    color: var(--text-muted);
     padding: 50px 60px 20px;
+    border-top: 1px solid var(--border);
 }
 
 .footer-cols {
@@ -12,7 +13,7 @@
 
 .footer h4 {
     margin-bottom: 10px;
-    color: white;
+    color: var(--text);
 }
 
 .footer p {
@@ -24,5 +25,5 @@
     text-align: center;
     margin-top: 30px;
     font-size: 13px;
-    color: #aaa;
+    color: var(--text-muted);
 }
