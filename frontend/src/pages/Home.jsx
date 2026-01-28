@@ -110,3 +110,4 @@ const Home = () => {
 };
 
 export default Home;
+// TODO: Add loading state for products and categories
