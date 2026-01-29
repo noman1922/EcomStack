@@ -54,10 +54,10 @@ const Navbar = () => {
                     <span>{theme === 'light' ? 'Dark' : 'Light'}</span>
                 </div>
 
-                <div className="nav-item">
+                <Link to="/stores" className="nav-item">
                     <MapPin size={20} />
                     <span>Stores</span>
-                </div>
+                </Link>
 
                 <div
                     className={`nav-item profile-container ${isProfileOpen ? 'active' : ''}`}
@@ -104,10 +104,10 @@ const Navbar = () => {
                     </div>
                 </div>
 
-                <div className="nav-item">
+                <Link to="/wishlist" className="nav-item">
                     <Heart size={20} />
                     <span>Wishlist</span>
-                </div>
+                </Link>
 
                 <Link to="/cart" className="nav-item">
                     <ShoppingBag size={20} />

@@ -17,6 +17,10 @@ export const CartProvider = ({ children }) => {
     useEffect(() => {
         if (user) {
             syncPendingItem();
+        } else {
+            // Clear cart when user logs out
+            setCart([]);
+            localStorage.removeItem('cart');
         }
     }, [user]);
 

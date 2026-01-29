@@ -1,19 +1,36 @@
 import "./Auth.css";
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const { login } = useAuth();
+    const { login, executePendingAction } = useAuth();
+    const { addToCart } = useCart();
+    const { addToWishlist } = useWishlist();
     const navigate = useNavigate();
 
     const handleSubmit = async e => {
         e.preventDefault();
         try {
             const user = await login(email, password);
+
+            // Execute pending action if exists
+            const pendingAction = executePendingAction();
+            if (pendingAction) {
+                if (pendingAction.type === 'addToCart') {
+                    addToCart({ ...pendingAction.product, quantity: pendingAction.quantity });
+                    alert('Added to bag!');
+                } else if (pendingAction.type === 'addToWishlist') {
+                    await addToWishlist(pendingAction.product);
+                    alert('Added to wishlist!');
+                }
+            }
+
             if (user?.role === 'admin') {
                 navigate('/admin');
             } else {

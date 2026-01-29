@@ -47,8 +47,8 @@ class AuthController extends Controller
             'role' => $request->role ?? 'customer',
         ]);
 
-        $tokenStr = $user->createToken('auth_token', ['*'], now()->addHours(24))->plainTextToken;
-        $cookie = cookie('auth_token', $tokenStr, 60 * 24, null, null, false, true);
+        $tokenStr = $user->createToken('auth_token', ['*'], now()->addHours(2))->plainTextToken;
+        $cookie = cookie('auth_token', $tokenStr, 0, null, null, false, true);
 
         return response()->json([
             'user' => $user,
@@ -87,8 +87,8 @@ class AuthController extends Controller
             ]);
         }
 
-        $tokenStr = $user->createToken('auth_token', ['*'], now()->addHours(24))->plainTextToken;
-        $cookie = cookie('auth_token', $tokenStr, 60 * 24, null, null, false, true);
+        $tokenStr = $user->createToken('auth_token', ['*'], now()->addHours(2))->plainTextToken;
+        $cookie = cookie('auth_token', $tokenStr, 0, null, null, false, true);
 
         return response()->json([
             'user' => $user,
@@ -108,5 +108,43 @@ class AuthController extends Controller
         // $request->user()->currentAccessToken()->delete(); // Optional: revoking token
         $cookie = cookie()->forget('auth_token');
         return response()->json(['message' => 'Logged out'])->withCookie($cookie);
+    }
+
+    #[OA\Put(
+        path: "/api/user/profile",
+        summary: "Update user profile",
+        tags: ["Auth"],
+        security: [["sanctum" => []]]
+    )]
+    #[OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: "name", type: "string"),
+                new OA\Property(property: "email", type: "string"),
+                new OA\Property(property: "phone", type: "string"),
+                new OA\Property(property: "address", type: "string"),
+            ]
+        )
+    )]
+    #[OA\Response(response: 200, description: "Profile updated successfully")]
+    #[OA\Response(response: 401, description: "Unauthenticated")]
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|email|unique:users,email,' . $user->_id . ',_id',
+            'phone' => 'nullable|string',
+            'address' => 'nullable|string',
+        ]);
+
+        $user->update($validated);
+
+        return response()->json([
+            'message' => 'Profile updated successfully',
+            'user' => $user
+        ]);
     }
 }

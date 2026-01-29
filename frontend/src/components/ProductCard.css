@@ -5,6 +5,7 @@
     text-align: center;
     transition: transform 0.2s ease;
     border: 1px solid var(--border);
+    cursor: pointer;
 }
 
 .product-card:hover {
@@ -62,4 +63,34 @@
     color: var(--bg);
     cursor: pointer;
     border-radius: 20px;
+}
+
+.wishlist-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #666;
+}
+
+.wishlist-btn:hover {
+    background: white;
+    transform: scale(1.1);
+}
+
+.wishlist-btn.active {
+    color: #e74c3c;
+}
+
+.wishlist-btn.active:hover {
+    color: #c0392b;
 }

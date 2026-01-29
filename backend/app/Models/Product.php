@@ -13,7 +13,8 @@ class Product extends Model
         'description', 
         'price', 
         'stock', 
-        'image', 
+        'image',       // Primary image
+        'images',      // Additional images array
         'category',
         'category_id', 
         'brand', 
@@ -23,5 +24,12 @@ class Product extends Model
         'is_on_sale', 
         'discount_price', 
         'supplier_id'
+    ];
+
+    protected $casts = [
+        'price' => 'float',
+        'discount_price' => 'float',
+        'stock' => 'integer',
+        'images' => 'array',  // Cast images to array
     ];
 }

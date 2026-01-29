@@ -17,6 +17,12 @@ import {
     FolderTree
 } from 'lucide-react';
 import './Admin.css';
+import HeroSettings from './HeroSettings';
+import FooterSettings from './FooterSettings';
+import StoreSettings from './StoreSettings';
+import ManualOrder from './ManualOrder';
+import POS from './POS';
+import AboutSettings from './AboutSettings';
 
 const AdminDashboard = () => {
     const { user, loading: authLoading } = useAuth();
@@ -35,7 +41,15 @@ const AdminDashboard = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
-    const [newProduct, setNewProduct] = useState({ name: '', price: '', category: '', image: '', stock: 99, description: '' });
+    const [newProduct, setNewProduct] = useState({
+        name: '',
+        price: '',
+        category: '',
+        image: '',  // Primary image
+        images: [], // Additional images
+        stock: 99,
+        description: ''
+    });
 
     useEffect(() => {
         if (!authLoading) {
@@ -93,7 +107,7 @@ const AdminDashboard = () => {
             }
             setIsModalOpen(false);
             setEditingProduct(null);
-            setNewProduct({ name: '', price: '', category: '', image: '', stock: 99, description: '' });
+            setNewProduct({ name: '', price: '', category: '', image: '', images: [], stock: 99, description: '' });
             fetchData();
         } catch (err) {
             alert('Action failed');
@@ -159,11 +173,20 @@ const AdminDashboard = () => {
                     <button className={activeTab === 'categories' ? 'active' : ''} onClick={() => setActiveTab('categories')}>
                         <FolderTree size={20} /> Categories
                     </button>
+                    <button className={activeTab === 'manual-order' ? 'active' : ''} onClick={() => setActiveTab('manual-order')}>
+                        📝 Manual Order
+                    </button>
+                    <button className={activeTab === 'pos' ? 'active' : ''} onClick={() => setActiveTab('pos')}>
+                        🛒 POS System
+                    </button>
                     <button className={activeTab === 'ordered' ? 'active' : ''} onClick={() => setActiveTab('ordered')}>
                         <Clock size={20} /> Ordered Products
                     </button>
                     <button className={activeTab === 'delivered' ? 'active' : ''} onClick={() => setActiveTab('delivered')}>
                         <CheckCircle size={20} /> Delivered Products
+                    </button>
+                    <button className={activeTab === 'settings' ? 'active' : ''} onClick={() => setActiveTab('settings')}>
+                        <Edit size={20} /> Settings
                     </button>
                 </nav>
             </aside>
@@ -202,7 +225,11 @@ const AdminDashboard = () => {
                     <div className="admin-section animate-fade">
                         <div className="section-header">
                             <h2>Product Management</h2>
-                            <button className="btn-primary" onClick={() => { setEditingProduct(null); setNewProduct({ name: '', price: '', category: '', image: '', description: '' }); setIsModalOpen(true); }}>
+                            <button className="btn-primary" onClick={() => {
+                                setEditingProduct(null);
+                                setNewProduct({ name: '', price: '', category: '', image: '', images: [], description: '' });
+                                setIsModalOpen(true);
+                            }}>
                                 <Plus size={20} /> Add Product
                             </button>
                         </div>
@@ -330,6 +357,22 @@ const AdminDashboard = () => {
                         </div>
                     </div>
                 )}
+
+                {activeTab === 'settings' && (
+                    <div className="admin-section animate-fade">
+                        <div className="settings-tabs">
+                            <button className="settings-tab-btn active">Hero Images</button>
+                            <button className="settings-tab-btn">Footer</button>
+                            <button className="settings-tab-btn">Stores</button>
+                        </div>
+
+                        <div className="settings-content">
+                            <HeroSettings />
+                            <FooterSettings />
+                            <StoreSettings />
+                        </div>
+                    </div>
+                )}
             </main>
 
             {isModalOpen && (
@@ -352,7 +395,51 @@ const AdminDashboard = () => {
                                 ))}
                             </select>
 
-                            <input placeholder="Image URL" value={newProduct.image} onChange={e => setNewProduct({ ...newProduct, image: e.target.value })} />
+                            <div style={{ marginBottom: '15px' }}>
+                                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Primary Image URL *</label>
+                                <input
+                                    placeholder="Primary Image URL"
+                                    value={newProduct.image}
+                                    onChange={e => setNewProduct({ ...newProduct, image: e.target.value })}
+                                    required
+                                />
+                            </div>
+
+                            <div style={{ marginBottom: '15px' }}>
+                                <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500' }}>Additional Images (Optional)</label>
+                                {(newProduct.images || []).map((img, idx) => (
+                                    <div key={idx} style={{ display: 'flex', gap: '5px', marginBottom: '5px' }}>
+                                        <input
+                                            value={img}
+                                            onChange={e => {
+                                                const updated = [...(newProduct.images || [])];
+                                                updated[idx] = e.target.value;
+                                                setNewProduct({ ...newProduct, images: updated });
+                                            }}
+                                            placeholder={`Image URL ${idx + 1}`}
+                                            style={{ flex: 1 }}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const updated = (newProduct.images || []).filter((_, i) => i !== idx);
+                                                setNewProduct({ ...newProduct, images: updated });
+                                            }}
+                                            style={{ padding: '5px 10px', background: '#f44336', color: 'white', border: 'none', borderRadius: '4px' }}
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => setNewProduct({ ...newProduct, images: [...(newProduct.images || []), ''] })}
+                                    style={{ padding: '8px 16px', background: 'var(--primary)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', marginTop: '5px' }}
+                                >
+                                    + Add Image
+                                </button>
+                            </div>
+
                             <textarea placeholder="Description" value={newProduct.description} onChange={e => setNewProduct({ ...newProduct, description: e.target.value })} />
                             <div className="modal-actions">
                                 <button type="button" onClick={() => setIsModalOpen(false)}>Cancel</button>
