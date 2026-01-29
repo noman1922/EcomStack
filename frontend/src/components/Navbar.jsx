@@ -93,12 +93,20 @@ const Navbar = () => {
                             <li><Link to="/orders">Track Order</Link></li>
                             <li><Link to="/about">About Us</Link></li>
                             {user && (
-                                <li className="logout-item" onClick={(e) => {
-                                    e.stopPropagation();
-                                    logout();
-                                }}>
+                                <li
+                                    className="logout-item"
+                                    onClick={async (e) => {
+                                        e.stopPropagation();
+
+                                        await logout();     // wait until user is cleared
+                                        setIsOpen(false);   // close dropdown
+                                        navigate("/", { replace: true }); // force go home
+                                    }}
+                                >
                                     Logout
                                 </li>
+
+
                             )}
                         </ul>
                     </div>

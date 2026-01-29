@@ -71,6 +71,7 @@ class ReceiptController extends Controller
             'total' => 'required|numeric',
             'cash_received' => 'nullable|numeric',
             'customer_name' => 'nullable|string',
+            'payment_method' => 'nullable|string',
         ]);
 
         $user = $request->user();
@@ -83,7 +84,7 @@ class ReceiptController extends Controller
             'delivery_charge' => 0,
             'discount' => $validated['discount'] ?? 0,
             'total' => $validated['total'],
-            'payment_method' => 'cash',
+            'payment_method' => $validated['payment_method'] ?? 'cash',
             'payment_status' => 'paid',
             'customer_name' => $validated['customer_name'] ?? 'Walk-in Customer',
             'generated_at' => now(),
@@ -104,12 +105,13 @@ class ReceiptController extends Controller
             'delivery_charge' => 'required|numeric',
             'subtotal' => 'required|numeric',
             'total' => 'required|numeric',
+            'tracking_id' => 'nullable|string',
         ]);
 
         $user = $request->user();
         
-        // Generate tracking ID for manual orders
-        $trackingId = 'MAN-' . strtoupper(substr(md5(uniqid()), 0, 8));
+        // Use provided tracking ID or generate new one
+        $trackingId = $validated['tracking_id'] ?? ('MAN-' . strtoupper(substr(md5(uniqid()), 0, 8)));
 
         $receipt = Receipt::create([
             'receipt_number' => Receipt::generateReceiptNumber(),

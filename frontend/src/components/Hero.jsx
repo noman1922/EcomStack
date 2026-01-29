@@ -6,24 +6,7 @@ import './Hero.css';
 const Hero = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [slides, setSlides] = useState([
-        {
-            id: 1,
-            image: "https://images.unsplash.com/photo-1521335629791-ce4aec67dd47?q=80&w=1600&auto=format&fit=crop",
-            title: "Winter Collection",
-            subtitle: "Premium comfort for the cold season."
-        },
-        {
-            id: 2,
-            image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1600&auto=format&fit=crop",
-            title: "New Arrivals",
-            subtitle: "Discover the latest trends in fashion."
-        },
-        {
-            id: 3,
-            image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1600&auto=format&fit=crop",
-            title: "Exclusive Deals",
-            subtitle: "Up to 50% off on selected items."
-        }
+
     ]);
 
     useEffect(() => {

@@ -23,6 +23,7 @@ import StoreSettings from './StoreSettings';
 import ManualOrder from './ManualOrder';
 import POS from './POS';
 import AboutSettings from './AboutSettings';
+import POSSettings from './POSSettings';
 
 const AdminDashboard = () => {
     const { user, loading: authLoading } = useAuth();
@@ -358,6 +359,7 @@ const AdminDashboard = () => {
                     </div>
                 )}
 
+
                 {activeTab === 'settings' && (
                     <div className="admin-section animate-fade">
                         <div className="settings-tabs">
@@ -370,9 +372,14 @@ const AdminDashboard = () => {
                             <HeroSettings />
                             <FooterSettings />
                             <StoreSettings />
+                            <AboutSettings />
+                            <POSSettings />
                         </div>
                     </div>
                 )}
+
+                {activeTab === 'manual-order' && <ManualOrder />}
+                {activeTab === 'pos' && <POS />}
             </main>
 
             {isModalOpen && (

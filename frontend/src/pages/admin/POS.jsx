@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../../api/axios';
 import { QRCodeSVG as QRCode } from 'qrcode.react';
+import ReceiptPOS from '../../components/ReceiptPOS';
 import './POS.css';
 
 const POS = () => {
@@ -11,6 +12,9 @@ const POS = () => {
     const [customerName, setCustomerName] = useState('');
     const [qrUrl, setQrUrl] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
+    const [currentReceipt, setCurrentReceipt] = useState(null);
+    const [showReceipt, setShowReceipt] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState('cash');
 
     useEffect(() => {
         fetchProducts();
@@ -36,10 +40,16 @@ const POS = () => {
     };
 
     const addToCart = (product) => {
-        const existing = cart.find(p => p._id === product._id);
+        console.log('Adding to cart:', product);
+        const productId = product._id || product.id;
+        const existing = cart.find(p => (p._id || p.id) === productId);
+
+        console.log('Existing product:', existing);
+        console.log('Current cart:', cart);
+
         if (existing) {
             setCart(cart.map(p =>
-                p._id === product._id ? { ...p, quantity: p.quantity + 1 } : p
+                (p._id || p.id) === productId ? { ...p, quantity: p.quantity + 1 } : p
             ));
         } else {
             setCart([...cart, { ...product, quantity: 1 }]);
@@ -47,11 +57,12 @@ const POS = () => {
     };
 
     const updateQuantity = (productId, quantity) => {
+        console.log('Updating quantity for:', productId, 'to:', quantity);
         if (quantity <= 0) {
-            setCart(cart.filter(p => p._id !== productId));
+            setCart(cart.filter(p => (p._id || p.id) !== productId));
         } else {
             setCart(cart.map(p =>
-                p._id === productId ? { ...p, quantity } : p
+                (p._id || p.id) === productId ? { ...p, quantity } : p
             ));
         }
     };
@@ -68,6 +79,32 @@ const POS = () => {
         setIsProcessing(true);
 
         try {
+            // Create order as delivered (POS sales are instant)
+            const orderData = {
+                items: cart.map(p => ({
+                    product_id: p._id || p.id,
+                    name: p.name,
+                    price: p.price,
+                    quantity: p.quantity,
+                    image: p.image
+                })),
+                subtotal,
+                delivery_charge: 0,
+                total_amount: total,
+                shipping_address: {
+                    name: customerName || 'Walk-in Customer',
+                    phone: 'POS Sale',
+                    address: 'In-store purchase'
+                },
+                payment_method: paymentMethod,
+                payment_status: 'received',
+                order_status: 'delivered',
+                source: 'pos'
+            };
+
+            await api.post('/orders', orderData);
+
+            // Generate POS receipt
             const receiptData = {
                 items: cart.map(p => ({
                     product_id: p._id,
@@ -82,17 +119,16 @@ const POS = () => {
                 customer_name: customerName || 'Walk-in Customer'
             };
 
-            const res = await api.post('/receipts/pos', receiptData);
+            const receiptRes = await api.post('/receipts/pos', receiptData);
 
-            alert(`Sale completed! Receipt #${res.data.receipt_number}`);
+            // Show receipt
+            setCurrentReceipt(receiptRes.data);
+            setShowReceipt(true);
 
-            // Reset
+            // Reset cart
             setCart([]);
             setDiscount(0);
             setCustomerName('');
-
-            // Auto-print receipt
-            window.print();
         } catch (err) {
             console.error(err);
             alert('Failed to complete sale');
@@ -107,6 +143,16 @@ const POS = () => {
 
     return (
         <div className="pos-container">
+            {showReceipt && currentReceipt && (
+                <ReceiptPOS
+                    receipt={currentReceipt}
+                    onClose={() => {
+                        setShowReceipt(false);
+                        setCurrentReceipt(null);
+                    }}
+                />
+            )}
+
             <div className="pos-grid">
                 {/* Left: Products */}
                 <div className="pos-products">
@@ -156,6 +202,13 @@ const POS = () => {
                                         <button onClick={() => updateQuantity(item._id, item.quantity - 1)}>-</button>
                                         <span>{item.quantity}</span>
                                         <button onClick={() => updateQuantity(item._id, item.quantity + 1)}>+</button>
+                                        <button
+                                            className="btn-remove"
+                                            onClick={() => updateQuantity(item._id, 0)}
+                                            title="Remove item"
+                                        >
+                                            ✕
+                                        </button>
                                     </div>
                                     <span className="item-total">{item.price * item.quantity}tk</span>
                                 </div>
@@ -191,6 +244,26 @@ const POS = () => {
                         </div>
                     </div>
 
+                    <div className="payment-method">
+                        <label>Payment Method:</label>
+                        <div className="payment-options">
+                            <button
+                                type="button"
+                                className={`payment-btn ${paymentMethod === 'cash' ? 'active' : ''}`}
+                                onClick={() => setPaymentMethod('cash')}
+                            >
+                                💵 Cash
+                            </button>
+                            <button
+                                type="button"
+                                className={`payment-btn ${paymentMethod === 'card' ? 'active' : ''}`}
+                                onClick={() => setPaymentMethod('card')}
+                            >
+                                💳 Card
+                            </button>
+                        </div>
+                    </div>
+
                     <button
                         onClick={handleCompleteSale}
                         className="btn-complete"
@@ -202,7 +275,8 @@ const POS = () => {
                     {qrUrl && (
                         <div className="qr-preview">
                             <small>Receipt QR Code Preview:</small>
-                            <QRCode value={qrUrl} size={80} />
+                            <QRCode value={qrUrl} size={80} key={qrUrl} />
+                            <p style={{ fontSize: '10px', marginTop: '5px', color: 'var(--text-muted)' }}>{qrUrl}</p>
                         </div>
                     )}
                 </div>

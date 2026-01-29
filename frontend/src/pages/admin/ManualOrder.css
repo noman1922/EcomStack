@@ -182,6 +182,17 @@
     border-color: var(--primary);
 }
 
+.quantity-controls .btn-remove {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+    margin-left: 5px;
+}
+
+.quantity-controls .btn-remove:hover {
+    background: #dc2626;
+}
+
 .order-summary {
     background: var(--bg);
     padding: 15px;

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../../api/axios';
+import ReceiptOnline from '../../components/ReceiptOnline';
 import './ManualOrder.css';
 
 const ManualOrder = () => {
@@ -13,6 +14,8 @@ const ManualOrder = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [deliveryCharge, setDeliveryCharge] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showReceipt, setShowReceipt] = useState(false);
+    const [currentReceipt, setCurrentReceipt] = useState(null);
 
     useEffect(() => {
         fetchProducts();
@@ -36,10 +39,12 @@ const ManualOrder = () => {
     }, [customerInfo.address]);
 
     const addProduct = (product) => {
-        const existing = selectedProducts.find(p => p._id === product._id);
+        const productId = product._id || product.id;
+        const existing = selectedProducts.find(p => (p._id || p.id) === productId);
+
         if (existing) {
             setSelectedProducts(selectedProducts.map(p =>
-                p._id === product._id ? { ...p, quantity: p.quantity + 1 } : p
+                (p._id || p.id) === productId ? { ...p, quantity: p.quantity + 1 } : p
             ));
         } else {
             setSelectedProducts([...selectedProducts, { ...product, quantity: 1 }]);
@@ -48,10 +53,10 @@ const ManualOrder = () => {
 
     const updateQuantity = (productId, quantity) => {
         if (quantity <= 0) {
-            setSelectedProducts(selectedProducts.filter(p => p._id !== productId));
+            setSelectedProducts(selectedProducts.filter(p => (p._id || p.id) !== productId));
         } else {
             setSelectedProducts(selectedProducts.map(p =>
-                p._id === productId ? { ...p, quantity } : p
+                (p._id || p.id) === productId ? { ...p, quantity } : p
             ));
         }
     };
@@ -67,7 +72,7 @@ const ManualOrder = () => {
             // Create order
             const orderData = {
                 items: selectedProducts.map(p => ({
-                    product_id: p._id,
+                    product_id: p._id || p.id,
                     name: p.name,
                     price: p.price,
                     quantity: p.quantity,
@@ -86,9 +91,9 @@ const ManualOrder = () => {
             const orderRes = await api.post('/orders', orderData);
 
             // Generate receipt
-            await api.post('/receipts/manual', {
+            const receiptRes = await api.post('/receipts/manual', {
                 items: selectedProducts.map(p => ({
-                    product_id: p._id,
+                    product_id: p._id || p.id,
                     name: p.name,
                     price: p.price,
                     quantity: p.quantity
@@ -98,10 +103,13 @@ const ManualOrder = () => {
                 customer_address: customerInfo.address,
                 delivery_charge: deliveryCharge,
                 subtotal,
-                total
+                total,
+                tracking_id: orderRes.data.tracking_id
             });
 
-            alert(`Order created successfully! Tracking ID: ${orderRes.data.tracking_id}`);
+            // Show receipt
+            setCurrentReceipt(receiptRes.data);
+            setShowReceipt(true);
 
             // Reset form
             setSelectedProducts([]);
@@ -121,6 +129,16 @@ const ManualOrder = () => {
 
     return (
         <div className="manual-order-container">
+            {showReceipt && currentReceipt && (
+                <ReceiptOnline
+                    receipt={currentReceipt}
+                    onClose={() => {
+                        setShowReceipt(false);
+                        setCurrentReceipt(null);
+                    }}
+                />
+            )}
+
             <h2>📝 Manual Order Entry</h2>
             <p className="subtitle">For phone/social media orders</p>
 
@@ -137,7 +155,7 @@ const ManualOrder = () => {
                     />
                     <div className="product-list">
                         {filteredProducts.map(product => (
-                            <div key={product._id} className="product-item">
+                            <div key={product._id || product.id} className="product-item">
                                 <img src={product.image} alt={product.name} />
                                 <div className="product-info">
                                     <h4>{product.name}</h4>
@@ -183,12 +201,20 @@ const ManualOrder = () => {
                         ) : (
                             <div className="selected-products">
                                 {selectedProducts.map(product => (
-                                    <div key={product._id} className="selected-item">
+                                    <div key={product._id || product.id} className="selected-item">
                                         <span>{product.name}</span>
                                         <div className="quantity-controls">
-                                            <button type="button" onClick={() => updateQuantity(product._id, product.quantity - 1)}>-</button>
+                                            <button type="button" onClick={() => updateQuantity(product._id || product.id, product.quantity - 1)}>-</button>
                                             <span>{product.quantity}</span>
-                                            <button type="button" onClick={() => updateQuantity(product._id, product.quantity + 1)}>+</button>
+                                            <button type="button" onClick={() => updateQuantity(product._id || product.id, product.quantity + 1)}>+</button>
+                                            <button
+                                                type="button"
+                                                className="btn-remove"
+                                                onClick={() => updateQuantity(product._id || product.id, 0)}
+                                                title="Remove product"
+                                            >
+                                                ✕
+                                            </button>
                                         </div>
                                         <span>{product.price * product.quantity}tk</span>
                                     </div>
