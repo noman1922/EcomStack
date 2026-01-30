@@ -3,7 +3,7 @@
 A high-performance, premium, and modern e-commerce platform with an integrated Point of Sale (POS) system. Built with **Laravel (PHP)**, **React.js**, and **MongoDB**.
 
 🔗 **Live Links**
-- **Full Project (Vercel)**: [ecomstack-shop.vercel.app](https://ecom-stack-five.vercel.app/)
+- **Full Project (Vercel)**: [ecom-stack-five.vercel.app](https://ecom-stack-five.vercel.app/)
 - **Backend API (Render)**: [ecomstack.onrender.com](https://ecomstack.onrender.com)
 
 ---
@@ -14,6 +14,7 @@ A high-performance, premium, and modern e-commerce platform with an integrated P
 - [System Architecture](#-system-architecture)
 - [Role-Based Access Control](#-role-based-access-control-rbac)
 - [Tech Stack](#-tech-stack)
+- [Database Schema](#-database-schema)
 - [Core Workflows](#-core-workflows)
 - [Getting Started](#-getting-started)
 - [Project Structure](#-project-structure)
@@ -39,10 +40,15 @@ A high-performance, premium, and modern e-commerce platform with an integrated P
 ---
 
 ## 🧠 System Architecture
-The system follows a decoupled architecture:
-1. **Frontend (React)**: Handles all user interactions, state management, and premium visual effects.
-2. **Backend (Laravel API)**: Provides a secure RESTful API, handles business logic, and manages the MongoDB connection.
-3. **Database (MongoDB Atlas)**: A NoSQL document store for high scalability and flexible data modeling.
+
+```mermaid
+graph TD
+    User((User/Admin)) -->|Interacts| Frontend[React.js SPA]
+    Frontend -->|API Requests| Backend[Laravel 11 API]
+    Backend -->|Data Sync| Database[(MongoDB Atlas)]
+    Backend -->|Payments| Stripe[Stripe API]
+    Backend -->|Storage| Local[File System]
+```
 
 ---
 
@@ -75,10 +81,80 @@ The system follows a decoupled architecture:
 
 ---
 
+## 🗄️ Database Schema
+
+```mermaid
+erDiagram
+    Users ||--o{ Orders : places
+    Users {
+        string _id
+        string name
+        string email
+        string password
+        string role
+    }
+    Products ||--o{ Orders : contains
+    Products {
+        string _id
+        string name
+        string category
+        float price
+        int stock
+        string image
+    }
+    Orders ||--o{ Receipts : generates
+    Orders {
+        string _id
+        string tracking_id
+        string user_id
+        array items
+        float total_amount
+        string order_status
+    }
+    Settings {
+        string key
+        string value
+    }
+```
+
+---
+
 ## 🔄 Core Workflows
-1. **The Customer Journey**: Browse products -> Add to Cart -> Secure Stripe Checkout -> Order Verification.
-2. **The Admin POS Flow**: Select products in-store -> Apply Discount -> Select Payment (Cash/Card) -> Print/View QR Receipt.
-3. **The Global QR System**: Admins can update the receipt QR URL once in Settings, and it instantly updates across all 3 order types (Manual, POS, Online).
+
+### 1. Authentication Process
+```mermaid
+sequenceDiagram
+    User->>Frontend: Enter Credentials
+    Frontend->>Backend: POST /api/login
+    Backend-->>User: Validate & Hash Check
+    Backend->>Frontend: Return Bearer Token + User Data
+    Frontend->>LocalStorage: Store auth_token
+    Frontend->>User: Access Granted
+```
+
+### 2. Product Checkout (Stripe)
+```mermaid
+sequenceDiagram
+    Customer->>Cart: View Items
+    Customer->>Stripe: Enter Card Details
+    Frontend->>Backend: POST /api/orders (with Payment Intent)
+    Backend->>Stripe: Confirm Payment
+    Stripe-->>Backend: Success
+    Backend->>Database: Decrement Stock & Create Order
+    Backend-->>Frontend: Return Order Summary
+```
+
+### 3. QR Receipt Generation (POS)
+```mermaid
+sequenceDiagram
+    Admin->>POS: Select Products
+    Admin->>POS: Apply Discount
+    POS->>Backend: POST /api/orders (source: pos)
+    Backend->>Database: Save Transaction
+    Backend->>Frontend: Return Tracking ID
+    Frontend->>QRService: Generate SVG with QR URL
+    Admin->>Customer: Handover Printed Receipt
+```
 
 ---
 
@@ -89,39 +165,16 @@ The system follows a decoupled architecture:
 - MongoDB Atlas Account
 
 ### **Backend Setup**
-1. Navigate to the backend folder:
-   ```bash
-   cd backend
-   ```
-2. Install dependencies:
-   ```bash
-   composer install
-   ```
-3. Configure `.env`:
-   - Set `DB_CONNECTION=mongodb`
-   - Set your `DB_URI`, `STRIPE_SECRET_KEY`, and `APP_KEY`.
-4. Run the server:
-   ```bash
-   php artisan serve
-   ```
+1. Navigate to the backend folder: `cd backend`
+2. Install dependencies: `composer install`
+3. Configure `.env`: Set `DB_CONNECTION=mongodb`, `DB_URI`, `STRIPE_SECRET_KEY`, and `APP_KEY`.
+4. Run: `php artisan serve`
 
 ### **Frontend Setup**
-1. Navigate to the frontend folder:
-   ```bash
-   cd frontend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Create `.env`:
-   ```bash
-   VITE_API_URL=http://localhost:8000/api
-   ```
-4. Start development:
-   ```bash
-   npm run dev
-   ```
+1. Navigate to the frontend folder: `cd frontend`
+2. Install: `npm install`
+3. Create `.env`: `VITE_API_URL=http://localhost:8000/api`
+4. Start: `npm run dev`
 
 ---
 
