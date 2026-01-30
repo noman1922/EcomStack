@@ -5,16 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Models\Product;
-use OpenApi\Attributes as OA;
 
 class ProductController extends Controller
 {
-    #[OA\Get(
-        path: "/api/products",
-        summary: "Get all products",
-        tags: ["Products"]
-    )]
-    #[OA\Response(response: 200, description: "List of products")]
     public function index(Request $request)
     {
         $query = Product::query();
@@ -46,27 +39,6 @@ class ProductController extends Controller
         return $query->get();
     }
 
-    #[OA\Post(
-        path: "/api/products",
-        summary: "Create a new product",
-        tags: ["Products"],
-        security: [["sanctum" => []]]
-    )]
-    #[OA\RequestBody(
-        required: true,
-        content: new OA\JsonContent(
-            required: ["name", "price", "stock"],
-            properties: [
-                new OA\Property(property: "name", type: "string"),
-                new OA\Property(property: "description", type: "string"),
-                new OA\Property(property: "price", type: "number", format: "float"),
-                new OA\Property(property: "stock", type: "integer"),
-                new OA\Property(property: "image", type: "string"),
-            ]
-        )
-    )]
-    #[OA\Response(response: 201, description: "Product created")]
-    #[OA\Response(response: 401, description: "Unauthenticated")]
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -85,16 +57,6 @@ class ProductController extends Controller
         return Product::create($validated);
     }
 
-    #[OA\Get(
-        path: "/api/products/{id}",
-        summary: "Get product by ID",
-        tags: ["Products"],
-        parameters: [
-            new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "string"))
-        ]
-    )]
-    #[OA\Response(response: 200, description: "Product details")]
-    #[OA\Response(response: 404, description: "Product not found")]
     public function show(string $id)
     {
         return Product::findOrFail($id);

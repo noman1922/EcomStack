@@ -5,17 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Models\Order;
-use OpenApi\Attributes as OA;
 
 class OrderController extends Controller
 {
-    #[OA\Get(
-        path: "/api/orders",
-        summary: "Get all user orders",
-        tags: ["Orders"],
-        security: [["sanctum" => []]]
-    )]
-    #[OA\Response(response: 200, description: "List of orders")]
     public function index(Request $request)
     {
         if ($request->user()->role === 'admin') {
@@ -24,24 +16,6 @@ class OrderController extends Controller
         return Order::where('user_id', $request->user()->id)->orderBy('created_at', 'desc')->get();
     }
 
-    #[OA\Post(
-        path: "/api/orders",
-        summary: "Create a new order",
-        tags: ["Orders"],
-        security: [["sanctum" => []]]
-    )]
-    #[OA\RequestBody(
-        required: true,
-        content: new OA\JsonContent(
-            required: ["items", "total_price"],
-            properties: [
-                new OA\Property(property: "items", type: "array", items: new OA\Items(type: "object")),
-                new OA\Property(property: "total_price", type: "number", format: "float"),
-            ]
-        )
-    )]
-    #[OA\Response(response: 201, description: "Order created")]
-    #[OA\Response(response: 401, description: "Unauthenticated")]
     public function store(Request $request)
     {
         $request->validate([

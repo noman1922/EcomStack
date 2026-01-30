@@ -6,16 +6,9 @@ use App\Models\Review;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Request;
-use OpenApi\Attributes as OA;
 
 class ReviewController extends Controller
 {
-    #[OA\Get(
-        path: "/api/products/{productId}/reviews",
-        summary: "Get all reviews for a product",
-        tags: ["Reviews"]
-    )]
-    #[OA\Response(response: 200, description: "List of reviews")]
     public function index($productId)
     {
         $reviews = Review::where('product_id', $productId)
@@ -26,14 +19,6 @@ class ReviewController extends Controller
         return response()->json($reviews);
     }
 
-    #[OA\Post(
-        path: "/api/products/{productId}/reviews",
-        summary: "Add a review for a product",
-        tags: ["Reviews"],
-        security: [["sanctum" => []]]
-    )]
-    #[OA\Response(response: 201, description: "Review created")]
-    #[OA\Response(response: 400, description: "Not eligible to review")]
     public function store(Request $request, $productId)
     {
         $user = $request->user();
@@ -83,13 +68,6 @@ class ReviewController extends Controller
         return response()->json($review, 201);
     }
 
-    #[OA\Delete(
-        path: "/api/reviews/{id}",
-        summary: "Delete a review",
-        tags: ["Reviews"],
-        security: [["sanctum" => []]]
-    )]
-    #[OA\Response(response: 200, description: "Review deleted")]
     public function destroy(Request $request, $id)
     {
         $user = $request->user();
@@ -122,13 +100,6 @@ class ReviewController extends Controller
         ]);
     }
 
-    #[OA\Get(
-        path: "/api/user/pending-reviews",
-        summary: "Get products pending review for logged-in user",
-        tags: ["Reviews"],
-        security: [["sanctum" => []]]
-    )]
-    #[OA\Response(response: 200, description: "List of products pending review")]
     public function pendingReviews(Request $request)
     {
         $user = $request->user();

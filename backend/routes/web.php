@@ -3,5 +3,9 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return redirect('/api/documentation');
+    return response()->json([
+        'status' => 'success',
+        'message' => 'EcomStack API is live',
+        'version' => '1.0.0'
+    ]);
 });
