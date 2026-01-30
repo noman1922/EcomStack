@@ -14,7 +14,20 @@ const Stores = () => {
     const fetchStores = async () => {
         try {
             const response = await api.get('/settings/stores');
-            setStores(response.data.value || []);
+            if (response.data.value) {
+                let val = response.data.value;
+                if (typeof val === 'string') {
+                    try {
+                        val = JSON.parse(val);
+                    } catch (e) {
+                        console.error("Error parsing stores", e);
+                        val = [];
+                    }
+                }
+                setStores(Array.isArray(val) ? val : []);
+            } else {
+                setStores([]);
+            }
         } catch (err) {
             console.error('Error fetching stores:', err);
         } finally {

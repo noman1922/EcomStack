@@ -29,9 +29,14 @@ const Home = () => {
                 ]);
 
                 // Sort by newest by default
-                const sorted = pRes.data.sort((a, b) => new Date(b.created_at || b._id) - new Date(a.created_at || a._id));
+                const productsData = Array.isArray(pRes.data) ? pRes.data : [];
+                const sorted = [...productsData].sort((a, b) => {
+                    const dateB = new Date(b.created_at || b._id);
+                    const dateA = new Date(a.created_at || a._id);
+                    return (dateB.getTime() || 0) - (dateA.getTime() || 0);
+                });
                 setProducts(sorted);
-                setCategories(cRes.data);
+                setCategories(Array.isArray(cRes.data) ? cRes.data : []);
             } catch (err) {
                 console.error("Error fetching home data:", err);
             }
@@ -43,18 +48,20 @@ const Home = () => {
         }
     }, [user, authLoading]);
 
-    const handleAddToCart = (product) => {
+    const handleAddToCart = (e, product) => {
+        e?.stopPropagation();
         if (!user) {
             sessionStorage.setItem('pendingCartItem', JSON.stringify(product));
             navigate('/login');
             return;
         }
         addToCart(product);
+        alert('Added to bag!');
     }
 
     const filteredProducts = products.filter(p => {
         const matchesCategory = selectedCategory === "All" || p.category === selectedCategory;
-        const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesSearch = (p.name || '').toLowerCase().includes(searchTerm.toLowerCase());
         return matchesCategory && matchesSearch;
     });
 
@@ -82,23 +89,20 @@ const Home = () => {
                 <section className="products">
                     <h2>{searchTerm ? `Search Results for "${searchTerm}"` : (selectedCategory === "All" ? "New Arrivals" : selectedCategory)}</h2>
 
-                    <div className="product-grid">
-                        {filteredProducts.length > 0 ? (
-                            filteredProducts.map(p => (
-                                <div key={p._id || p.id} onClick={() => handleProductClick(p._id || p.id)}>
-                                    <ProductCard
-                                        product={p}
-                                        onAddToCart={(e) => {
-                                            e?.stopPropagation(); // Prevent navigation when clicking add to cart
-                                            handleAddToCart(p);
-                                        }}
-                                    />
-                                </div>
-                            ))
-                        ) : (
+                    <div className="product-grid animate-fade delay-300">
+                        {filteredProducts.length === 0 ? (
                             <p style={{ gridColumn: "1/-1", textAlign: "center", padding: "40px" }}>
                                 No products found.
                             </p>
+                        ) : (
+                            filteredProducts.map((p, index) => (
+                                <div key={p._id || p.id} className={`animate-fade delay-${((index % 8) + 1) * 100}`} onClick={() => handleProductClick(p._id || p.id)}>
+                                    <ProductCard
+                                        product={p}
+                                        onAddToCart={(e) => handleAddToCart(e, p)}
+                                    />
+                                </div>
+                            ))
                         )}
                     </div>
                 </section>

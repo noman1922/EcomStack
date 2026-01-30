@@ -16,10 +16,21 @@ const ManualOrder = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showReceipt, setShowReceipt] = useState(false);
     const [currentReceipt, setCurrentReceipt] = useState(null);
+    const [qrUrl, setQrUrl] = useState('');
 
     useEffect(() => {
         fetchProducts();
+        fetchQRUrl();
     }, []);
+
+    const fetchQRUrl = async () => {
+        try {
+            const res = await api.get('/settings/receipt-qr');
+            setQrUrl(res.data.url || '');
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const fetchProducts = async () => {
         try {
@@ -132,6 +143,7 @@ const ManualOrder = () => {
             {showReceipt && currentReceipt && (
                 <ReceiptOnline
                     receipt={currentReceipt}
+                    qrUrl={qrUrl}
                     onClose={() => {
                         setShowReceipt(false);
                         setCurrentReceipt(null);

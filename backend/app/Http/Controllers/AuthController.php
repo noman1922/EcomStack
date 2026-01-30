@@ -47,12 +47,10 @@ class AuthController extends Controller
             'role' => $request->role ?? 'customer',
         ]);
 
-        $tokenStr = $user->createToken('auth_token', ['*'], now()->addHours(2))->plainTextToken;
-        $cookie = cookie('auth_token', $tokenStr, 0, null, null, false, true);
-
         return response()->json([
+            'message' => 'Registration successful. Please login.',
             'user' => $user,
-        ])->withCookie($cookie);
+        ]);
     }
 
     #[OA\Post(
@@ -70,7 +68,17 @@ class AuthController extends Controller
             ]
         )
     )]
-    #[OA\Response(response: 200, description: "Successful login")]
+    #[OA\Response(
+        response: 200,
+        description: "Successful login",
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: "user", type: "object"),
+                new OA\Property(property: "token", type: "string"),
+                new OA\Property(property: "token_type", type: "string", example: "Bearer"),
+            ]
+        )
+    )]
     #[OA\Response(response: 422, description: "Invalid credentials")]
     public function login(Request $request)
     {
@@ -92,6 +100,8 @@ class AuthController extends Controller
 
         return response()->json([
             'user' => $user,
+            'token' => $tokenStr,
+            'token_type' => 'Bearer',
         ])->withCookie($cookie);
     }
 

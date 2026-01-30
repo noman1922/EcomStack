@@ -15,9 +15,22 @@ const HeroSettings = () => {
     const fetchHeroImages = async () => {
         try {
             const response = await api.get('/settings/hero_images');
-            setHeroImages(response.data.value || []);
+            let val = response.data.value;
+
+            // Defensive parsing
+            if (val && typeof val === 'string') {
+                try {
+                    val = JSON.parse(val);
+                } catch (e) {
+                    console.error("Error parsing hero images JSON", e);
+                    val = [];
+                }
+            }
+
+            setHeroImages(Array.isArray(val) ? val : []);
         } catch (err) {
             console.error('Error fetching hero images:', err);
+            setHeroImages([]);
         }
     };
 
@@ -86,8 +99,8 @@ const HeroSettings = () => {
             )}
 
             <div className="hero-slides-grid">
-                {heroImages.map(slide => (
-                    <div key={slide.id} className="hero-slide-card">
+                {Array.isArray(heroImages) && heroImages.map(slide => (
+                    <div key={slide.id || Math.random()} className="hero-slide-card">
                         <img src={slide.image} alt={slide.title} style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '8px' }} />
                         <div className="slide-info">
                             <h4>{slide.title}</h4>

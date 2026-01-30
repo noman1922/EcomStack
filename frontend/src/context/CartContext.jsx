@@ -6,8 +6,14 @@ const CartContext = createContext();
 export const CartProvider = ({ children }) => {
     const { user } = useAuth();
     const [cart, setCart] = useState(() => {
-        const saved = localStorage.getItem('cart');
-        return saved ? JSON.parse(saved) : [];
+        try {
+            const saved = localStorage.getItem('cart');
+            return saved ? JSON.parse(saved) : [];
+        } catch (e) {
+            console.error("Error parsing cart from localStorage", e);
+            localStorage.removeItem('cart');
+            return [];
+        }
     });
 
     useEffect(() => {

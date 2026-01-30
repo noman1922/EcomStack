@@ -54,11 +54,12 @@ class OrderController extends Controller
         // Validate stock availability for all items
         $items = $request->items;
         foreach ($items as $item) {
-            $product = \App\Models\Product::find($item['product_id']);
+            $pid = $item['product_id'] ?? ($item['_id'] ?? ($item['id'] ?? null));
+            $product = \App\Models\Product::find($pid);
             
             if (!$product) {
                 return response()->json([
-                    'message' => "Product not found"
+                    'message' => "Product not found: " . ($item['name'] ?? 'Unknown')
                 ], 404);
             }
             
@@ -93,10 +94,13 @@ class OrderController extends Controller
 
         // Deduct stock after successful order creation
         foreach ($items as $item) {
-            $product = \App\Models\Product::find($item['product_id']);
-            $newStock = (int)$product->stock - (int)$item['quantity'];
-            $product->stock = max(0, $newStock); // Ensure never negative
-            $product->save();
+            $pid = $item['product_id'] ?? ($item['_id'] ?? ($item['id'] ?? null));
+            $product = \App\Models\Product::find($pid);
+            if ($product) {
+                $newStock = (int)$product->stock - (int)$item['quantity'];
+                $product->stock = max(0, $newStock); // Ensure never negative
+                $product->save();
+            }
         }
 
         return response()->json($order, 201);

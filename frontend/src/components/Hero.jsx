@@ -14,8 +14,19 @@ const Hero = () => {
         const fetchHeroImages = async () => {
             try {
                 const response = await api.get('/settings/hero_images');
-                if (response.data.value && response.data.value.length > 0) {
-                    setSlides(response.data.value);
+                if (response.data.value) {
+                    let val = response.data.value;
+                    if (typeof val === 'string') {
+                        try {
+                            val = JSON.parse(val);
+                        } catch (e) {
+                            console.error("Error parsing hero images", e);
+                            val = [];
+                        }
+                    }
+                    if (Array.isArray(val) && val.length > 0) {
+                        setSlides(val);
+                    }
                 }
             } catch (err) {
                 console.log('Using default hero images');
@@ -25,6 +36,8 @@ const Hero = () => {
     }, []);
 
     useEffect(() => {
+        if (slides.length === 0) return;
+
         const timer = setInterval(() => {
             setCurrentSlide((prev) => (prev + 1) % slides.length);
         }, 5000); // Auto-slide every 5 seconds
@@ -45,7 +58,7 @@ const Hero = () => {
                     <div className="hero-overlay"></div>
                     <div className="hero-content">
                         <h1 className="hero-title">
-                            {slide.title.split(' ').map((word, idx) => (
+                            {(slide.title || '').split(' ').map((word, idx) => (
                                 <span key={idx} className="hero-title-word">{word}</span>
                             ))}
                         </h1>

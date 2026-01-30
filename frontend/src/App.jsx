@@ -32,7 +32,7 @@ function App() {
             <Router>
               <div className="app-wrapper">
                 <Navbar />
-                <main>
+                <main className="animate-fade">
                   <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />

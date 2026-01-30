@@ -21,9 +21,20 @@ const StoreSettings = () => {
     const fetchStores = async () => {
         try {
             const response = await api.get('/settings/stores');
-            setStores(response.data.value || []);
+            let val = response.data.value;
+
+            if (val && typeof val === 'string') {
+                try {
+                    val = JSON.parse(val);
+                } catch (e) {
+                    val = [];
+                }
+            }
+
+            setStores(Array.isArray(val) ? val : []);
         } catch (err) {
             console.error('Error fetching stores:', err);
+            setStores([]);
         }
     };
 

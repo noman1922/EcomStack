@@ -7,20 +7,48 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Initial Auth Check
     useEffect(() => {
         const checkAuth = async () => {
             try {
                 const res = await api.get('/user');
                 setUser(res.data);
             } catch (err) {
-                // Not authenticated
                 setUser(null);
             } finally {
                 setLoading(false);
             }
         };
         checkAuth();
-    }, []);
+    }, []); // Run once on mount
+
+    // Inactivity Timeout (1 Hour)
+    useEffect(() => {
+        let timeout;
+        const resetTimer = () => {
+            if (timeout) clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                if (user) {
+                    console.log("Session expired due to inactivity");
+                    logout();
+                }
+            }, 3600000); // 1 hour in ms
+        };
+
+        if (user) {
+            window.addEventListener('mousemove', resetTimer);
+            window.addEventListener('keypress', resetTimer);
+            window.addEventListener('click', resetTimer);
+            resetTimer();
+        }
+
+        return () => {
+            if (timeout) clearTimeout(timeout);
+            window.removeEventListener('mousemove', resetTimer);
+            window.removeEventListener('keypress', resetTimer);
+            window.removeEventListener('click', resetTimer);
+        };
+    }, [user]); // Only reset when user login status changes
 
     const login = async (email, password) => {
         const res = await api.post('/login', { email, password });
@@ -30,7 +58,6 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (data) => {
         const res = await api.post('/register', data);
-        setUser(res.data.user);
         return res.data.user;
     };
 

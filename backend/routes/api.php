@@ -20,6 +20,7 @@ Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/orders/{id}', [OrderController::class, 'show']);
 
 // Public settings access
+Route::get('/settings/receipt-qr', [SettingController::class, 'getReceiptQR']);
 Route::get('/settings', [SettingController::class, 'index']);
 Route::get('/settings/{key}', [SettingController::class, 'show']);
 
@@ -73,7 +74,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/admins/{id}', [App\Http\Controllers\AdminController::class, 'destroy']);
     
     // Settings Routes
-    Route::get('/settings/receipt-qr', [App\Http\Controllers\SettingController::class, 'getReceiptQR']);
+    // Route::get('/settings/receipt-qr', [App\Http\Controllers\SettingController::class, 'getReceiptQR']); // Moved to public
     Route::post('/settings/receipt-qr', [App\Http\Controllers\SettingController::class, 'updateReceiptQR']);
     
     // Stripe Routes

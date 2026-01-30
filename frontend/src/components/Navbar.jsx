@@ -99,7 +99,7 @@ const Navbar = () => {
                                         e.stopPropagation();
 
                                         await logout();     // wait until user is cleared
-                                        setIsOpen(false);   // close dropdown
+                                        setIsProfileOpen(false);   // close dropdown
                                         navigate("/", { replace: true }); // force go home
                                     }}
                                 >

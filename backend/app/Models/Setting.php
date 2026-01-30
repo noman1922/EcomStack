@@ -9,6 +9,8 @@ class Setting extends Model
     protected $collection = 'settings';
     
     protected $fillable = [
+        'key',
+        'value',
         'receipt_qr_url',
         'store_name',
         'store_address',

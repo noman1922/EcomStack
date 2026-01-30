@@ -47,7 +47,7 @@ const ProductCard = ({ product, onAddToCart }) => {
                 </button>
             </div>
 
-            <h3>{product.name}</h3>
+            <h3 title={product.name}>{product.name}</h3>
 
             <div className="price">
                 {product.discount_price ? (
@@ -62,7 +62,7 @@ const ProductCard = ({ product, onAddToCart }) => {
 
             <button
                 className="add-cart"
-                onClick={() => onAddToCart(product)}
+                onClick={(e) => onAddToCart(e, product)}
             >
                 Add to Cart
             </button>

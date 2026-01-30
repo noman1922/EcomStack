@@ -32,8 +32,8 @@ const POS = () => {
 
     const fetchQRUrl = async () => {
         try {
-            const res = await api.get('/settings/pos_qr_url');
-            setQrUrl(res.data.value || window.location.origin);
+            const res = await api.get('/settings/receipt-qr');
+            setQrUrl(res.data.url || window.location.origin);
         } catch (err) {
             console.error('Error fetching QR URL:', err);
             setQrUrl(window.location.origin);
@@ -165,6 +165,7 @@ const POS = () => {
             {showReceipt && currentReceipt && (
                 <ReceiptPOS
                     receipt={currentReceipt}
+                    qrUrl={qrUrl}
                     onClose={() => {
                         setShowReceipt(false);
                         setCurrentReceipt(null);

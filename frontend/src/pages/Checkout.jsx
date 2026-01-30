@@ -144,7 +144,8 @@ const Checkout = () => {
                 shipping_address: { ...shipping, zone: deliveryZone },
                 payment_method: paymentMethod,
                 payment_id: stripePaymentId,
-                payment_status: paymentMethod === 'cod' ? 'Delivery Fee Paid' : 'Paid'
+                payment_status: paymentMethod === 'cod' ? 'Delivery Fee Paid' : 'Paid',
+                source: 'online'
             };
 
             const res = await api.post('/orders', orderData);

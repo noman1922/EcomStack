@@ -66,17 +66,6 @@ const AdminManagement = () => {
         }
     };
 
-    // Only super admin can access this
-    if (!user?.is_super_admin) {
-        return (
-            <div className="admin-management-restricted">
-                <Shield size={48} className="restricted-icon" />
-                <h2>Access Restricted</h2>
-                <p>Only super administrators can manage admin users.</p>
-            </div>
-        );
-    }
-
     if (loading) {
         return <div className="loading">Loading admins...</div>;
     }

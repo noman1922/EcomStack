@@ -49,10 +49,21 @@
     text-decoration: none;
     position: relative;
     gap: 4px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-item:hover {
+    color: var(--primary);
+    transform: translateY(-2px);
 }
 
 .nav-item span {
     margin-top: 2px;
+    transition: transform 0.3s ease;
+}
+
+.nav-item:hover span {
+    transform: scale(1.05);
 }
 
 /* PROFILE DROPDOWN */

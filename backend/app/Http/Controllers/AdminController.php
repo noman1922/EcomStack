@@ -16,8 +16,8 @@ class AdminController extends Controller
     {
         $user = $request->user();
         
-        // Only super admin can view admins list
-        if (!$user->is_super_admin) {
+        // All admins can view the list
+        if ($user->role !== 'admin') {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -33,9 +33,9 @@ class AdminController extends Controller
     {
         $user = $request->user();
         
-        // Only super admin can create admins
-        if (!$user->is_super_admin) {
-            return response()->json(['message' => 'Unauthorized. Only super admin can create admins.'], 403);
+        // All admins can create other admins
+        if ($user->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
         }
 
         $validated = $request->validate([
@@ -70,8 +70,8 @@ class AdminController extends Controller
     {
         $user = $request->user();
         
-        // Only super admin can delete admins
-        if (!$user->is_super_admin) {
+        // All admins can delete admins
+        if ($user->role !== 'admin') {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 

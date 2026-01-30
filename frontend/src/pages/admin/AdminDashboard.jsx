@@ -28,7 +28,6 @@ import AboutSettings from './AboutSettings';
 import POSSettings from './POSSettings';
 import SalesReportModal from '../../components/SalesReportModal';
 import AdminManagement from './AdminManagement';
-import POSSettings from './POSSettings';
 import './Admin.css';
 
 const AdminDashboard = () => {
@@ -207,11 +206,9 @@ const AdminDashboard = () => {
                     <button className={activeTab === 'settings' ? 'active' : ''} onClick={() => setActiveTab('settings')}>
                         <Edit size={20} /> Settings
                     </button>
-                    {user?.is_super_admin && (
-                        <button className={activeTab === 'admins' ? 'active' : ''} onClick={() => setActiveTab('admins')}>
-                            👥 Admins
-                        </button>
-                    )}
+                    <button className={activeTab === 'admins' ? 'active' : ''} onClick={() => setActiveTab('admins')}>
+                        👥 Admins
+                    </button>
                 </nav>
             </aside>
 
@@ -438,8 +435,8 @@ const AdminDashboard = () => {
                                     // Filter delivered orders by source
                                     if (activeTab === 'delivered' && deliveredFilter) {
                                         if (deliveredFilter === 'pos') return order.source === 'pos';
-                                        if (deliveredFilter === 'manual') return order.source === 'manual' || (!order.source && order.order_status === 'delivered');
-                                        if (deliveredFilter === 'online') return order.source !== 'pos' && order.source !== 'manual';
+                                        if (deliveredFilter === 'manual') return order.source === 'manual';
+                                        if (deliveredFilter === 'online') return order.source === 'online' || !order.source;
                                     }
                                     return true;
                                 })
@@ -516,10 +513,6 @@ const AdminDashboard = () => {
                         </div>
                     </div>
                 )}
-
-                {activeTab === 'admins' && user?.is_super_admin && <AdminManagement />}
-
-                {activeTab === 'settings' && <POSSettings />}
 
                 {activeTab === 'manual-order' && <ManualOrder />}
                 {activeTab === 'pos' && <POS />}

@@ -6,21 +6,25 @@ import { QRCodeSVG } from 'qrcode.react';
 import api from '../api/axios';
 import './Receipt.css';
 
-const ReceiptOnline = ({ receipt, onClose }) => {
+const ReceiptOnline = ({ receipt, qrUrl: propQrUrl, onClose }) => {
     const componentRef = useRef();
-    const [qrUrl, setQrUrl] = useState('');
+    const [qrUrl, setQrUrl] = useState(propQrUrl || '');
 
     useEffect(() => {
-        const fetchQRUrl = async () => {
-            try {
-                const res = await api.get('/settings/receipt-qr');
-                setQrUrl(res.data.url || '');
-            } catch (err) {
-                setQrUrl('');
-            }
-        };
-        fetchQRUrl();
-    }, []);
+        if (!propQrUrl) {
+            const fetchQRUrl = async () => {
+                try {
+                    const res = await api.get('/settings/receipt-qr');
+                    setQrUrl(res.data.url || '');
+                } catch (err) {
+                    setQrUrl('');
+                }
+            };
+            fetchQRUrl();
+        } else {
+            setQrUrl(propQrUrl);
+        }
+    }, [propQrUrl]);
 
     const handlePrint = useReactToPrint({
         content: () => componentRef.current,

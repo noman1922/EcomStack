@@ -36,8 +36,9 @@ const Login = () => {
             } else {
                 navigate('/');
             }
-        } catch {
-            setError('Invalid credentials');
+        } catch (err) {
+            setError(err.response?.data?.message || 'Invalid credentials');
+            setPassword('');
         }
     };
 
@@ -47,11 +48,11 @@ const Login = () => {
                 <h2>LOGIN</h2>
 
                 <div className="social-login">
-                    <button className="social-button">
+                    <button className="social-button" onClick={() => alert('Google Social login is coming soon!')}>
                         <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="social-icon" />
                         <span>Google</span>
                     </button>
-                    <button className="social-button">
+                    <button className="social-button" onClick={() => alert('Apple Social login is coming soon!')}>
                         <img src="https://www.svgrepo.com/show/303125/apple-logo.svg" alt="Apple" className="social-icon" />
                         <span>Apple</span>
                     </button>

@@ -21,9 +21,22 @@
     margin-bottom: 6px;
 }
 
-.footer-bottom {
-    text-align: center;
-    margin-top: 30px;
-    font-size: 13px;
-    color: var(--text-muted);
+.social-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: #cfcfcf;
+    text-decoration: none;
+}
+
+.social-link svg {
+    width: 16px;
+    height: 16px;
+    opacity: 0.9;
+}
+
+.social-link:hover {
+    color: #ffffff;
 }

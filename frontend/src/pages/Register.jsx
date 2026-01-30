@@ -17,8 +17,14 @@ const Register = () => {
         if (password !== confirm) return setError('Passwords do not match');
 
         try {
-            await register({ name, email, password });
-            navigate('/');
+            await register({
+                name,
+                email,
+                password,
+                password_confirmation: confirm
+            });
+            alert('Registration successful! Please login.');
+            navigate('/login');
         } catch {
             setError('Registration failed');
         }
@@ -30,11 +36,11 @@ const Register = () => {
                 <h2>CREATE ACCOUNT</h2>
 
                 <div className="social-login">
-                    <button className="social-button">
+                    <button className="social-button" onClick={() => alert('Google Social login is coming soon!')}>
                         <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="social-icon" />
                         <span>Google</span>
                     </button>
-                    <button className="social-button">
+                    <button className="social-button" onClick={() => alert('Apple Social login is coming soon!')}>
                         <img src="https://www.svgrepo.com/show/303125/apple-logo.svg" alt="Apple" className="social-icon" />
                         <span>Apple</span>
                     </button>

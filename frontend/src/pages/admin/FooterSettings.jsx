@@ -12,10 +12,11 @@ const FooterSettings = () => {
             { label: 'FAQs', link: '/faqs' }
         ],
         socialMedia: [
-            { label: 'Facebook', link: 'https://facebook.com' },
-            { label: 'Instagram', link: 'https://instagram.com' },
-            { label: 'YouTube', link: 'https://youtube.com' }
-        ],
+            { type: 'facebook', label: 'Facebook', link: 'https://facebook.com' },
+            { type: 'linkedin', label: 'LinkedIn', link: 'https://linkedin.com' },
+            { type: 'github', label: 'GitHub', link: 'https://github.com' }
+        ]
+        ,
         copyright: '© 2026 EcomStack. All rights reserved.'
     });
 
@@ -26,12 +27,37 @@ const FooterSettings = () => {
     const fetchFooter = async () => {
         try {
             const response = await api.get('/settings/footer_content');
-            if (response.data.value) {
-                setFooterData(response.data.value);
+            let val = response.data.value;
+
+            if (val && typeof val === 'string') {
+                try {
+                    val = JSON.parse(val);
+                } catch (e) {
+                    val = null;
+                }
+            }
+
+            if (val) {
+                // Ensure arrays exist for map functions
+                setFooterData({
+                    ...val,
+                    customerCare: Array.isArray(val.customerCare) ? val.customerCare : [],
+                    socialMedia: Array.isArray(val.socialMedia) ? val.socialMedia : []
+                });
             }
         } catch (err) {
             console.error('Error fetching footer:', err);
         }
+    };
+
+    const addSocialPlatform = () => {
+        const updated = [...footerData.socialMedia, { label: 'New Platform', link: '' }];
+        setFooterData({ ...footerData, socialMedia: updated });
+    };
+
+    const removeSocialPlatform = (index) => {
+        const updated = footerData.socialMedia.filter((_, i) => i !== index);
+        setFooterData({ ...footerData, socialMedia: updated });
     };
 
     const handleSave = async () => {
@@ -74,7 +100,7 @@ const FooterSettings = () => {
 
                 <div className="settings-card">
                     <h3>Customer Care Links</h3>
-                    {footerData.customerCare.map((item, idx) => (
+                    {(footerData.customerCare || []).map((item, idx) => (
                         <div key={idx} style={{ marginBottom: '10px' }}>
                             <input
                                 placeholder="Label"
@@ -92,20 +118,29 @@ const FooterSettings = () => {
                 </div>
 
                 <div className="settings-card">
-                    <h3>Social Media Links</h3>
-                    {footerData.socialMedia.map((item, idx) => (
-                        <div key={idx} style={{ marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                        <h3>Social Media Links</h3>
+                        <button className="btn-primary" onClick={addSocialPlatform} style={{ padding: '4px 10px', fontSize: '12px' }}>+ Add</button>
+                    </div>
+                    {(footerData.socialMedia || []).map((item, idx) => (
+                        <div key={idx} style={{ marginBottom: '15px', padding: '10px', background: 'rgba(0,0,0,0.05)', borderRadius: '8px', position: 'relative' }}>
                             <input
-                                placeholder="Platform"
-                                value={item.label}
+                                placeholder="Platform Name (e.g. Facebook)"
+                                value={item.type || item.label}
                                 onChange={e => updateSocialMedia(idx, 'label', e.target.value)}
                                 style={{ marginBottom: '5px' }}
                             />
                             <input
-                                placeholder="URL"
+                                placeholder="Profile URL"
                                 value={item.link}
                                 onChange={e => updateSocialMedia(idx, 'link', e.target.value)}
                             />
+                            <button
+                                onClick={() => removeSocialPlatform(idx)}
+                                style={{ position: 'absolute', right: '5px', top: '5px', padding: '2px 8px', background: '#ff4444', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                            >
+                                ✕
+                            </button>
                         </div>
                     ))}
                 </div>

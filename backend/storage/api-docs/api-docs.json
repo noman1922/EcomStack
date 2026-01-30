@@ -49,6 +49,15 @@
                                         "type": "string",
                                         "format": "password",
                                         "example": "password123"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "enum": [
+                                            "customer",
+                                            "admin",
+                                            "supplier"
+                                        ],
+                                        "example": "customer"
                                     }
                                 },
                                 "type": "object"
@@ -101,7 +110,26 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Successful login"
+                        "description": "Successful login",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user": {
+                                            "type": "object"
+                                        },
+                                        "token": {
+                                            "type": "string"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "422": {
                         "description": "Invalid credentials"
@@ -119,6 +147,52 @@
                 "responses": {
                     "200": {
                         "description": "Logged out"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/user/profile": {
+            "put": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Update user profile",
+                "operationId": "4a75ccb2b8a3aa3f7230a2a2dd1de04d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "address": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profile updated successfully"
                     },
                     "401": {
                         "description": "Unauthenticated"
@@ -222,8 +296,7 @@
                             "schema": {
                                 "required": [
                                     "name",
-                                    "price",
-                                    "stock"
+                                    "price"
                                 ],
                                 "properties": {
                                     "name": {
@@ -237,7 +310,11 @@
                                         "format": "float"
                                     },
                                     "stock": {
-                                        "type": "integer"
+                                        "type": "integer",
+                                        "default": 99
+                                    },
+                                    "category": {
+                                        "type": "string"
                                     },
                                     "image": {
                                         "type": "string"
@@ -289,6 +366,181 @@
                     }
                 }
             }
+        },
+        "/api/products/{productId}/reviews": {
+            "get": {
+                "tags": [
+                    "Reviews"
+                ],
+                "summary": "Get all reviews for a product",
+                "operationId": "94de12083eff5297ddc753ae78bab275",
+                "responses": {
+                    "200": {
+                        "description": "List of reviews"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Reviews"
+                ],
+                "summary": "Add a review for a product",
+                "operationId": "468970884a765ecd9d8946611b2b56f8",
+                "responses": {
+                    "201": {
+                        "description": "Review created"
+                    },
+                    "400": {
+                        "description": "Not eligible to review"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/reviews/{id}": {
+            "delete": {
+                "tags": [
+                    "Reviews"
+                ],
+                "summary": "Delete a review",
+                "operationId": "89986343b5dbd2b909c2764aeb7e4096",
+                "responses": {
+                    "200": {
+                        "description": "Review deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/user/pending-reviews": {
+            "get": {
+                "tags": [
+                    "Reviews"
+                ],
+                "summary": "Get products pending review for logged-in user",
+                "operationId": "275d1f370c699c35c861aae1f5bf0ae8",
+                "responses": {
+                    "200": {
+                        "description": "List of products pending review"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/wishlist": {
+            "get": {
+                "tags": [
+                    "Wishlist"
+                ],
+                "summary": "Get user's wishlist",
+                "operationId": "7de9c05c67c97110c68860d9c0b814f9",
+                "responses": {
+                    "200": {
+                        "description": "Wishlist items"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Wishlist"
+                ],
+                "summary": "Add product to wishlist",
+                "operationId": "b254af311d2f414d5fb8fc20756ba6b0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "product_id"
+                                ],
+                                "properties": {
+                                    "product_id": {
+                                        "type": "string",
+                                        "example": "507f1f77bcf86cd799439011"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Product added to wishlist"
+                    },
+                    "400": {
+                        "description": "Product already in wishlist"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/wishlist/{productId}": {
+            "delete": {
+                "tags": [
+                    "Wishlist"
+                ],
+                "summary": "Remove product from wishlist",
+                "operationId": "aef4fb5294629bbb98c5327a4422fe59",
+                "parameters": [
+                    {
+                        "name": "productId",
+                        "in": "path",
+                        "description": "Product ID to remove from wishlist",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Product removed from wishlist"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Product not in wishlist"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -312,6 +564,14 @@
         {
             "name": "Products",
             "description": "Products"
+        },
+        {
+            "name": "Reviews",
+            "description": "Reviews"
+        },
+        {
+            "name": "Wishlist",
+            "description": "Wishlist"
         }
     ]
 }

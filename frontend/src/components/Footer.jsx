@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Facebook, Linkedin, Github, Instagram, Youtube, Twitter } from 'lucide-react';
+
 import api from '../api/axios';
 import './Footer.css';
 
@@ -13,10 +15,10 @@ const Footer = () => {
         ],
         socialMedia: [
             { label: 'Facebook', link: 'https://facebook.com' },
-            { label: 'Instagram', link: 'https://instagram.com' },
-            { label: 'YouTube', link: 'https://youtube.com' }
+            { label: 'Linkedin', link: 'https://linkedin.com' },
+            { label: 'Github', link: 'https://github.com' }
         ],
-        copyright: '© 2026 EcomStack. All rights reserved.'
+        copyright: '© 2026 Abdullah Al Noman Khan. All rights reserved.'
     });
 
     useEffect(() => {
@@ -24,14 +26,34 @@ const Footer = () => {
             try {
                 const response = await api.get('/settings/footer_content');
                 if (response.data.value) {
-                    setFooterData(response.data.value);
+                    let val = response.data.value;
+                    if (typeof val === 'string') {
+                        val = JSON.parse(val);
+                    }
+                    if (val && typeof val === 'object') {
+                        setFooterData(prev => ({ ...prev, ...val }));
+                    }
                 }
-            } catch (err) {
+            } catch {
                 console.log('Using default footer content');
             }
         };
         fetchFooter();
     }, []);
+
+    const getIcon = (item) => {
+        const type = (item.type || item.label || '').toLowerCase();
+
+        if (type.includes('facebook')) return <Facebook size={18} />;
+        if (type.includes('linkedin')) return <Linkedin size={18} />;
+        if (type.includes('github')) return <Github size={18} />;
+        if (type.includes('instagram')) return <Instagram size={18} />;
+        if (type.includes('youtube')) return <Youtube size={18} />;
+        if (type.includes('twitter') || type.includes('x')) return <Twitter size={18} />;
+
+        return null;
+    };
+
 
     return (
         <footer className="footer">
@@ -54,9 +76,17 @@ const Footer = () => {
                 <div>
                     <h4>Follow Us</h4>
                     {footerData.socialMedia.map((item, idx) => (
-                        <p key={idx}>
-                            <a href={item.link} target="_blank" rel="noopener noreferrer">{item.label}</a>
-                        </p>
+                        <a
+                            key={idx}
+                            href={item.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="social-link"
+                        >
+                            {getIcon(item)}
+                            <span>{item.label}</span>
+                        </a>
+
                     ))}
                 </div>
 
