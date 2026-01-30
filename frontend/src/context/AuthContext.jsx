@@ -10,10 +10,17 @@ export const AuthProvider = ({ children }) => {
     // Initial Auth Check
     useEffect(() => {
         const checkAuth = async () => {
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+                setLoading(false);
+                return;
+            }
+
             try {
                 const res = await api.get('/user');
                 setUser(res.data);
             } catch (err) {
+                localStorage.removeItem('auth_token');
                 setUser(null);
             } finally {
                 setLoading(false);
@@ -52,8 +59,10 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         const res = await api.post('/login', { email, password });
-        setUser(res.data.user);
-        return res.data.user;
+        const { user, token } = res.data;
+        localStorage.setItem('auth_token', token);
+        setUser(user);
+        return user;
     };
 
     const register = async (data) => {
@@ -81,6 +90,7 @@ export const AuthProvider = ({ children }) => {
         } catch (err) {
             console.error('Logout failed', err);
         }
+        localStorage.removeItem('auth_token');
         setUser(null);
     };
 
