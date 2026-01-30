@@ -64,25 +64,6 @@ class AuthController extends Controller
         return response()->json(['message' => 'Logged out'])->withCookie($cookie);
     }
 
-    #[OA\Put(
-        path: "/api/user/profile",
-        summary: "Update user profile",
-        tags: ["Auth"],
-        security: [["sanctum" => []]]
-    )]
-    #[OA\RequestBody(
-        required: true,
-        content: new OA\JsonContent(
-            properties: [
-                new OA\Property(property: "name", type: "string"),
-                new OA\Property(property: "email", type: "string"),
-                new OA\Property(property: "phone", type: "string"),
-                new OA\Property(property: "address", type: "string"),
-            ]
-        )
-    )]
-    #[OA\Response(response: 200, description: "Profile updated successfully")]
-    #[OA\Response(response: 401, description: "Unauthenticated")]
     public function updateProfile(Request $request)
     {
         $user = $request->user();
