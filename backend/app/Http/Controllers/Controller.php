@@ -10,8 +10,8 @@ use OpenApi\Attributes as OA;
     description: "API Documentation for the EcommercePro project"
 )]
 #[OA\Server(
-    url: 'http://localhost:8000',
-    description: "Demo API Server"
+    url: L5_SWAGGER_CONST_HOST,
+    description: "API Server"
 )]
 #[OA\SecurityScheme(
     type: "http",
