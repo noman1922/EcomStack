@@ -51,21 +51,53 @@ class OrderController extends Controller
             'payment_method' => 'required|string',
         ]);
 
+        // Validate stock availability for all items
+        $items = $request->items;
+        foreach ($items as $item) {
+            $product = \App\Models\Product::find($item['product_id']);
+            
+            if (!$product) {
+                return response()->json([
+                    'message' => "Product not found"
+                ], 404);
+            }
+            
+            $currentStock = (int)$product->stock; // Ensure integer
+            $requestedQty = (int)$item['quantity'];
+            
+            if ($currentStock < $requestedQty) {
+                return response()->json([
+                    'message' => "{$product->name} is out of stock. Available: {$currentStock}, Requested: {$requestedQty}"
+                ], 400);
+            }
+        }
+
         $trackingId = 'TRK-' . strtoupper(uniqid());
 
         $order = Order::create([
             'user_id' => $request->user()->id,
             'items' => $request->items,
-            'subtotal' => $request->subtotal,
-            'delivery_charge' => $request->delivery_charge,
+            'subtotal' => $request->subtotal ?? $request->total_amount,
+            'delivery_charge' => $request->delivery_charge ?? 0,
             'total_amount' => $request->total_amount,
             'shipping_address' => $request->shipping_address,
             'payment_method' => $request->payment_method,
             'payment_id' => $request->payment_id,
             'payment_status' => $request->payment_status ?? 'pending',
-            'order_status' => 'pending',
+            'order_status' => $request->order_status ?? 'pending',
             'tracking_id' => $trackingId,
+            'source' => $request->source ?? 'online',
+            'customer_name' => $request->customer_name,
+            'discount_amount' => $request->discount_amount ?? 0,
         ]);
+
+        // Deduct stock after successful order creation
+        foreach ($items as $item) {
+            $product = \App\Models\Product::find($item['product_id']);
+            $newStock = (int)$product->stock - (int)$item['quantity'];
+            $product->stock = max(0, $newStock); // Ensure never negative
+            $product->save();
+        }
 
         return response()->json($order, 201);
     }

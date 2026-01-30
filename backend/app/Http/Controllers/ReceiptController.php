@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Receipt;
 use App\Models\Order;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 
 class ReceiptController extends Controller
@@ -34,6 +35,9 @@ class ReceiptController extends Controller
         ]);
 
         $order = Order::findOrFail($validated['order_id']);
+        
+        // Fetch QR URL from settings
+        $qrUrl = Setting::where('key', 'pos_qr_url')->first()?->value ?? null;
 
         $receipt = Receipt::create([
             'receipt_number' => Receipt::generateReceiptNumber(),
@@ -51,6 +55,7 @@ class ReceiptController extends Controller
             'customer_phone' => $order->shipping_address['phone'] ?? '',
             'customer_address' => $order->shipping_address['address'] ?? '',
             'tracking_id' => $order->tracking_id,
+            'qr_code_url' => $qrUrl,
             'generated_at' => now(),
         ]);
 
@@ -76,6 +81,16 @@ class ReceiptController extends Controller
 
         $user = $request->user();
 
+        // Fetch QR URL and store address from settings
+        $qrUrl = Setting::where('key', 'pos_qr_url')->first()?->value ?? null;
+        
+        // Get store address from stores setting
+        $stores = Setting::where('key', 'stores')->first()?->value ?? [];
+        $storeAddress = 'Store Address Here';
+        if (!empty($stores) && is_array($stores) && isset($stores[0])) {
+            $storeAddress = $stores[0]['address'] ?? 'Store Address Here';
+        }
+
         $receipt = Receipt::create([
             'receipt_number' => Receipt::generateReceiptNumber(),
             'receipt_type' => 'pos',
@@ -87,6 +102,8 @@ class ReceiptController extends Controller
             'payment_method' => $validated['payment_method'] ?? 'cash',
             'payment_status' => 'paid',
             'customer_name' => $validated['customer_name'] ?? 'Walk-in Customer',
+            'qr_code_url' => $qrUrl,
+            'store_address' => $storeAddress,
             'generated_at' => now(),
             'generated_by' => $user->_id,
         ]);
@@ -112,6 +129,9 @@ class ReceiptController extends Controller
         
         // Use provided tracking ID or generate new one
         $trackingId = $validated['tracking_id'] ?? ('MAN-' . strtoupper(substr(md5(uniqid()), 0, 8)));
+        
+        // Fetch QR URL from settings
+        $qrUrl = Setting::where('key', 'pos_qr_url')->first()?->value ?? null;
 
         $receipt = Receipt::create([
             'receipt_number' => Receipt::generateReceiptNumber(),
@@ -127,6 +147,7 @@ class ReceiptController extends Controller
             'customer_phone' => $validated['customer_phone'],
             'customer_address' => $validated['customer_address'],
             'tracking_id' => $trackingId,
+            'qr_code_url' => $qrUrl,
             'generated_at' => now(),
             'generated_by' => $user->_id,
         ]);

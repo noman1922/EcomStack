@@ -1,11 +1,26 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { QRCodeSVG } from 'qrcode.react';
+import api from '../api/axios';
 import './Receipt.css';
 
 const ReceiptOnline = ({ receipt, onClose }) => {
     const componentRef = useRef();
+    const [qrUrl, setQrUrl] = useState('');
+
+    useEffect(() => {
+        const fetchQRUrl = async () => {
+            try {
+                const res = await api.get('/settings/receipt-qr');
+                setQrUrl(res.data.url || '');
+            } catch (err) {
+                setQrUrl('');
+            }
+        };
+        fetchQRUrl();
+    }, []);
 
     const handlePrint = useReactToPrint({
         content: () => componentRef.current,
@@ -100,6 +115,13 @@ const ReceiptOnline = ({ receipt, onClose }) => {
                     </div>
 
                     <div className="receipt-divider"></div>
+
+                    {qrUrl && (
+                        <div className="receipt-qr" style={{ textAlign: 'center', marginTop: '20px', marginBottom: '20px' }}>
+                            <QRCodeSVG value={qrUrl} size={100} />
+                            <p style={{ fontSize: '0.75em', marginTop: '8px', color: '#666' }}>Scan for more info</p>
+                        </div>
+                    )}
 
                     <div className="receipt-footer">
                         <p>Thank you for shopping with us!</p>

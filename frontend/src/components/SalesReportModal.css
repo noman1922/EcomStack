@@ -1,0 +1,268 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.sales-report-modal {
+    background: var(--surface);
+    border-radius: 16px;
+    max-width: 900px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-header h2 {
+    margin: 0;
+    color: var(--text);
+    font-size: 1.5rem;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-icon,
+.btn-close {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--text);
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-close:hover {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+}
+
+.date-filter {
+    display: flex;
+    gap: 10px;
+    padding: 20px 30px;
+    border-bottom: 1px solid var(--border);
+}
+
+.date-filter button {
+    padding: 8px 20px;
+    border: 2px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.date-filter button:hover {
+    border-color: var(--primary);
+}
+
+.date-filter button.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.report-content {
+    padding: 30px;
+}
+
+.report-header-print {
+    display: none;
+}
+
+.sales-summary {
+    margin-bottom: 30px;
+}
+
+.summary-card {
+    background: linear-gradient(135deg, var(--primary), #8b5cf6);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.summary-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.summary-card .amount {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.sales-breakdown {
+    margin-bottom: 30px;
+}
+
+.sales-breakdown h3 {
+    margin: 0 0 20px 0;
+    color: var(--text);
+    font-size: 1.2rem;
+}
+
+.breakdown-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.card-header .icon {
+    font-size: 1.5rem;
+}
+
+.card-header h4 {
+    margin: 0;
+    color: var(--text);
+    font-size: 1.1rem;
+}
+
+.card-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.stat .label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.stat .value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.breakdown-card.pos {
+    border-left: 4px solid #6366f1;
+}
+
+.breakdown-card.manual {
+    border-left: 4px solid #f59e0b;
+}
+
+.breakdown-card.online {
+    border-left: 4px solid #10b981;
+}
+
+.delivery-charges {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+}
+
+.delivery-charges h3 {
+    margin: 0 0 10px 0;
+    color: var(--text);
+}
+
+.delivery-charges .amount {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 10px 0;
+}
+
+.delivery-charges small {
+    color: var(--text-muted);
+}
+
+.loading {
+    padding: 60px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+/* Print Styles */
+@media print {
+    .modal-overlay {
+        background: white;
+        position: static;
+    }
+
+    .sales-report-modal {
+        box-shadow: none;
+        max-height: none;
+        max-width: none;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .report-header-print {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #000;
+    }
+
+    .report-header-print h1 {
+        margin: 0 0 10px 0;
+        font-size: 2rem;
+    }
+
+    .report-header-print p {
+        margin: 5px 0;
+        color: #666;
+    }
+
+    .breakdown-card,
+    .summary-card,
+    .delivery-charges {
+        break-inside: avoid;
+    }
+}

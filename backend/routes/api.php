@@ -64,6 +64,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/receipts/pos', [ReceiptController::class, 'generatePOS']);
     Route::post('/receipts/manual', [ReceiptController::class, 'generateManual']);
     
+    // Sales Report Route
+    Route::get('/admin/sales-report', [App\Http\Controllers\SalesController::class, 'getSalesReport']);
+    
+    // Admin Management Routes (Super Admin only)
+    Route::get('/admins', [App\Http\Controllers\AdminController::class, 'index']);
+    Route::post('/admins', [App\Http\Controllers\AdminController::class, 'store']);
+    Route::delete('/admins/{id}', [App\Http\Controllers\AdminController::class, 'destroy']);
+    
+    // Settings Routes
+    Route::get('/settings/receipt-qr', [App\Http\Controllers\SettingController::class, 'getReceiptQR']);
+    Route::post('/settings/receipt-qr', [App\Http\Controllers\SettingController::class, 'updateReceiptQR']);
+    
     // Stripe Routes
     Route::post('/create-payment-intent', [PaymentController::class, 'createPaymentIntent']);
 });

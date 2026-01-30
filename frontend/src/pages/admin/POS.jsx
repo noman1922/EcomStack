@@ -26,7 +26,7 @@ const POS = () => {
             const res = await api.get('/products');
             setProducts(res.data);
         } catch (err) {
-            console.error(err);
+            console.error('Error fetching products:', err);
         }
     };
 
@@ -35,6 +35,7 @@ const POS = () => {
             const res = await api.get('/settings/pos_qr_url');
             setQrUrl(res.data.value || window.location.origin);
         } catch (err) {
+            console.error('Error fetching QR URL:', err);
             setQrUrl(window.location.origin);
         }
     };
@@ -102,12 +103,14 @@ const POS = () => {
                 source: 'pos'
             };
 
-            await api.post('/orders', orderData);
+            console.log('Creating order with data:', orderData);
+            const orderRes = await api.post('/orders', orderData);
+            console.log('Order created:', orderRes.data);
 
             // Generate POS receipt
             const receiptData = {
                 items: cart.map(p => ({
-                    product_id: p._id,
+                    product_id: p._id || p.id,
                     name: p.name,
                     price: p.price,
                     quantity: p.quantity
@@ -116,10 +119,13 @@ const POS = () => {
                 discount,
                 total,
                 cash_received: null,
-                customer_name: customerName || 'Walk-in Customer'
+                customer_name: customerName || 'Walk-in Customer',
+                payment_method: paymentMethod
             };
 
+            console.log('Creating receipt with data:', receiptData);
             const receiptRes = await api.post('/receipts/pos', receiptData);
+            console.log('Receipt created:', receiptRes.data);
 
             // Show receipt
             setCurrentReceipt(receiptRes.data);
@@ -129,9 +135,22 @@ const POS = () => {
             setCart([]);
             setDiscount(0);
             setCustomerName('');
+            setPaymentMethod('cash');
         } catch (err) {
-            console.error(err);
-            alert('Failed to complete sale');
+            console.error('Complete sale error:', err);
+            console.error('Error response:', err.response?.data);
+            console.error('Error status:', err.response?.status);
+
+            let errorMsg = 'Unknown error';
+            if (err.response?.data?.message) {
+                errorMsg = err.response.data.message;
+            } else if (err.response?.data?.errors) {
+                errorMsg = Object.values(err.response.data.errors).flat().join(', ');
+            } else if (err.message) {
+                errorMsg = err.message;
+            }
+
+            alert(`Failed to complete sale: ${errorMsg}`);
         } finally {
             setIsProcessing(false);
         }
@@ -167,7 +186,7 @@ const POS = () => {
                     <div className="pos-product-grid">
                         {filteredProducts.map(product => (
                             <div
-                                key={product._id}
+                                key={product._id || product.id}
                                 className="pos-product-card"
                                 onClick={() => addToCart(product)}
                             >
@@ -196,15 +215,15 @@ const POS = () => {
                             <p className="empty-cart">No items in cart</p>
                         ) : (
                             cart.map(item => (
-                                <div key={item._id} className="cart-item">
+                                <div key={item._id || item.id} className="cart-item">
                                     <span className="item-name">{item.name}</span>
                                     <div className="item-controls">
-                                        <button onClick={() => updateQuantity(item._id, item.quantity - 1)}>-</button>
+                                        <button onClick={() => updateQuantity(item._id || item.id, item.quantity - 1)}>-</button>
                                         <span>{item.quantity}</span>
-                                        <button onClick={() => updateQuantity(item._id, item.quantity + 1)}>+</button>
+                                        <button onClick={() => updateQuantity(item._id || item.id, item.quantity + 1)}>+</button>
                                         <button
                                             className="btn-remove"
-                                            onClick={() => updateQuantity(item._id, 0)}
+                                            onClick={() => updateQuantity(item._id || item.id, 0)}
                                             title="Remove item"
                                         >
                                             ✕

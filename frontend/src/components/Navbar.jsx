@@ -87,7 +87,7 @@ const Navbar = () => {
                             {user && user.role === 'admin' && (
                                 <li className="admin-link"><Link to="/admin">Admin Dashboard</Link></li>
                             )}
-                            {user && (
+                            {user && user.role !== 'admin' && (
                                 <li><Link to="/profile">View Profile</Link></li>
                             )}
                             <li><Link to="/orders">Track Order</Link></li>
@@ -112,15 +112,19 @@ const Navbar = () => {
                     </div>
                 </div>
 
-                <Link to="/wishlist" className="nav-item">
-                    <Heart size={20} />
-                    <span>Wishlist</span>
-                </Link>
+                {user && user.role !== 'admin' && (
+                    <>
+                        <Link to="/wishlist" className="nav-item">
+                            <Heart size={20} />
+                            <span>Wishlist</span>
+                        </Link>
 
-                <Link to="/cart" className="nav-item">
-                    <ShoppingBag size={20} />
-                    <span>Bag</span>
-                </Link>
+                        <Link to="/cart" className="nav-item">
+                            <ShoppingBag size={20} />
+                            <span>Bag</span>
+                        </Link>
+                    </>
+                )}
             </div>
         </nav>
     );

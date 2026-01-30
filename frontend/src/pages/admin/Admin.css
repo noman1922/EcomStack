@@ -148,6 +148,29 @@
     font-weight: 700;
 }
 
+.filter-btn {
+    padding: 8px 16px;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9em;
+    transition: all 0.2s;
+}
+
+.filter-btn:hover {
+    border-color: var(--primary);
+    background: var(--bg);
+}
+
+.filter-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
 .btn-primary {
     background: var(--primary);
     color: white;

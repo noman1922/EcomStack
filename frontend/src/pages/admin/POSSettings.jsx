@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
+import { Save } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import api from '../../api/axios';
-import './AdminSettings.css';
+import './POSSettings.css';
 
 const POSSettings = () => {
     const [qrUrl, setQrUrl] = useState('');
-    const [isSaving, setIsSaving] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState('');
 
     useEffect(() => {
         fetchQRUrl();
@@ -12,42 +15,68 @@ const POSSettings = () => {
 
     const fetchQRUrl = async () => {
         try {
-            const res = await api.get('/settings/pos_qr_url');
-            setQrUrl(res.data.value || '');
+            const res = await api.get('/settings/receipt-qr');
+            setQrUrl(res.data.url || '');
         } catch (err) {
-            console.error(err);
+            console.error('Failed to load QR URL:', err);
         }
     };
 
-    const handleSave = async () => {
-        setIsSaving(true);
+    const handleSave = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setMessage('');
+
         try {
-            await api.put('/settings/pos_qr_url', { value: qrUrl });
-            alert('POS QR URL saved successfully!');
+            await api.post('/settings/receipt-qr', { url: qrUrl });
+            setMessage('✅ QR URL saved successfully!');
+            setTimeout(() => setMessage(''), 3000);
         } catch (err) {
-            console.error(err);
-            alert('Failed to save QR URL');
+            setMessage('❌ Failed to save QR URL');
         } finally {
-            setIsSaving(false);
+            setLoading(false);
         }
     };
 
     return (
-        <div className="settings-section">
-            <h3>POS Receipt QR Code</h3>
-            <p className="subtitle">This QR code will appear on all POS receipts</p>
+        <div className="pos-settings-container">
+            <div className="settings-header">
+                <h2>📱 Receipt Settings</h2>
+                <p>Configure QR code that appears on all receipts (POS, Manual, Online)</p>
+            </div>
 
-            <input
-                type="url"
-                placeholder="Enter URL (e.g., https://yourstore.com)"
-                value={qrUrl}
-                onChange={(e) => setQrUrl(e.target.value)}
-                style={{ marginBottom: '15px' }}
-            />
+            <div className="settings-card">
+                <form onSubmit={handleSave}>
+                    <div className="form-group">
+                        <label>Receipt QR Code URL</label>
+                        <p className="help-text">This QR code will appear on all receipts</p>
+                        <input
+                            type="url"
+                            placeholder="https://yourstore.com"
+                            value={qrUrl}
+                            onChange={(e) => setQrUrl(e.target.value)}
+                            required
+                        />
+                    </div>
 
-            <button onClick={handleSave} disabled={isSaving} className="btn-save">
-                {isSaving ? 'Saving...' : 'Save QR URL'}
-            </button>
+                    <button type="submit" className="btn-save" disabled={loading}>
+                        <Save size={20} />
+                        {loading ? 'Saving...' : 'Save QR URL'}
+                    </button>
+
+                    {message && <p className="message">{message}</p>}
+                </form>
+
+                {qrUrl && (
+                    <div className="qr-preview">
+                        <h3>Receipt QR Code Preview</h3>
+                        <div className="qr-box">
+                            <QRCodeSVG value={qrUrl} size={150} />
+                        </div>
+                        <p className="preview-note">This QR code will appear on all receipts</p>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

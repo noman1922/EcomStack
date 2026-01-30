@@ -17,7 +17,10 @@ class Order extends Model
         'payment_id',
         'payment_status',
         'order_status',
-        'tracking_id'
+        'tracking_id',
+        'source',           // CRITICAL: Allow POS/manual/online tracking
+        'customer_name',    // For POS customer names
+        'discount_amount',  // For POS discounts
     ];
 
     protected $casts = [

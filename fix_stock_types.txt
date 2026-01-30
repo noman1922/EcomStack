@@ -1,0 +1,10 @@
+php artisan tinker
+
+// Fix existing products - convert stock from string to integer
+DB::table('products')->get()->each(function($product) {
+    DB::table('products')
+        ->where('_id', $product->_id)
+        ->update(['stock' => (int)($product->stock ?? 0)]);
+});
+
+exit

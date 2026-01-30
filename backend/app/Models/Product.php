@@ -29,7 +29,7 @@ class Product extends Model
     protected $casts = [
         'price' => 'float',
         'discount_price' => 'float',
-        'stock' => 'integer',
-        'images' => 'array',  // Cast images to array
+        'stock' => 'integer',  // CRITICAL: Must be integer for decrement()
+        'images' => 'array',
     ];
 }

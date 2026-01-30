@@ -14,7 +14,9 @@ import {
     Truck,
     Clock,
     XCircle,
-    FolderTree
+    FolderTree,
+    HandCoins,
+    Receipt
 } from 'lucide-react';
 import './Admin.css';
 import HeroSettings from './HeroSettings';
@@ -24,11 +26,17 @@ import ManualOrder from './ManualOrder';
 import POS from './POS';
 import AboutSettings from './AboutSettings';
 import POSSettings from './POSSettings';
+import SalesReportModal from '../../components/SalesReportModal';
+import AdminManagement from './AdminManagement';
+import POSSettings from './POSSettings';
+import './Admin.css';
 
 const AdminDashboard = () => {
     const { user, loading: authLoading } = useAuth();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('stats');
+    const [deliveredFilter, setDeliveredFilter] = useState(null); // null='all', 'pos', 'online'
+    const [showSalesReport, setShowSalesReport] = useState(false);
     const [products, setProducts] = useState([]);
     const [orders, setOrders] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -153,8 +161,18 @@ const AdminDashboard = () => {
         }
     };
 
-    const orderedOrders = orders.filter(o => o.order_status !== 'delivered' && o.order_status !== 'cancelled');
-    const deliveredOrders = orders.filter(o => o.order_status === 'delivered');
+    // Filter orders - POS orders should NOT appear in "Ordered Products"  
+    // They go directly to "Delivered Products" since they're completed in-store
+    const orderedOrders = orders.filter(o =>
+        o.order_status !== 'delivered' &&
+        o.order_status !== 'cancelled' &&
+        o.source !== 'pos' // Exclude POS from ordered tab
+    );
+
+    const deliveredOrders = orders.filter(o =>
+        o.order_status === 'delivered' ||
+        o.source === 'pos' // Include all POS in delivered tab
+    );
 
     if (authLoading) return <div className="admin-loading">Verifying credentials...</div>;
 
@@ -189,13 +207,26 @@ const AdminDashboard = () => {
                     <button className={activeTab === 'settings' ? 'active' : ''} onClick={() => setActiveTab('settings')}>
                         <Edit size={20} /> Settings
                     </button>
+                    {user?.is_super_admin && (
+                        <button className={activeTab === 'admins' ? 'active' : ''} onClick={() => setActiveTab('admins')}>
+                            👥 Admins
+                        </button>
+                    )}
                 </nav>
             </aside>
 
             <main className="admin-main">
+                {showSalesReport && (
+                    <SalesReportModal onClose={() => setShowSalesReport(false)} />
+                )}
+
                 {activeTab === 'stats' && (
                     <div className="stats-grid">
-                        <div className="stat-card gold">
+                        <div
+                            className="stat-card gold"
+                            onClick={() => setShowSalesReport(true)}
+                            style={{ cursor: 'pointer' }}
+                        >
                             <div className="stat-info">
                                 <span>Total Revenue</span>
                                 <h3>{stats.totalSales.toFixed(0)}tk</h3>
@@ -203,7 +234,11 @@ const AdminDashboard = () => {
                             </div>
                             <DollarSign className="stat-icon" size={24} />
                         </div>
-                        <div className="stat-card blue">
+                        <div
+                            className="stat-card blue"
+                            onClick={() => setActiveTab('ordered')}
+                            style={{ cursor: 'pointer' }}
+                        >
                             <div className="stat-info">
                                 <span>Total Orders</span>
                                 <h3>{stats.totalOrders}</h3>
@@ -211,13 +246,41 @@ const AdminDashboard = () => {
                             </div>
                             <ShoppingCart className="stat-icon" size={24} />
                         </div>
-                        <div className="stat-card purple">
+                        <div
+                            className="stat-card purple"
+                            onClick={() => setActiveTab('products')}
+                            style={{ cursor: 'pointer' }}
+                        >
                             <div className="stat-info">
                                 <span>Total Products</span>
                                 <h3>{stats.totalProducts}</h3>
                                 <p className="growth">Live in store</p>
                             </div>
                             <Package className="stat-icon" size={24} />
+                        </div>
+                        <div
+                            className="stat-card purple"
+                            onClick={() => setActiveTab('manual-order')}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            <div className="stat-info">
+                                <span>Manual Orders</span>
+                                <h3>{stats.manualOrders}</h3>
+                                <p className="growth">Order for Customer</p>
+                            </div>
+                            <HandCoins className="stat-icon" size={24} />
+                        </div>
+                        <div
+                            className="stat-card purple"
+                            onClick={() => setActiveTab('pos')}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            <div className="stat-info">
+                                <span>POS Orders</span>
+                                <h3>{stats.posOrders}</h3>
+                                <p className="growth">In Store Sales</p>
+                            </div>
+                            <Receipt className="stat-icon" size={24} />
                         </div>
                     </div>
                 )}
@@ -228,7 +291,7 @@ const AdminDashboard = () => {
                             <h2>Product Management</h2>
                             <button className="btn-primary" onClick={() => {
                                 setEditingProduct(null);
-                                setNewProduct({ name: '', price: '', category: '', image: '', images: [], description: '' });
+                                setNewProduct({ name: '', price: '', category: '', image: '', images: [], description: '', stock: 0 });
                                 setIsModalOpen(true);
                             }}>
                                 <Plus size={20} /> Add Product
@@ -242,6 +305,7 @@ const AdminDashboard = () => {
                                         <th>Product</th>
                                         <th>Category</th>
                                         <th>Price</th>
+                                        <th>Stock</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -254,6 +318,24 @@ const AdminDashboard = () => {
                                             </td>
                                             <td>{p.category}</td>
                                             <td>{p.price}tk</td>
+                                            <td>
+                                                {p.stock === 0 || !p.stock ? (
+                                                    <span style={{
+                                                        padding: '4px 12px',
+                                                        background: '#ef4444',
+                                                        color: 'white',
+                                                        borderRadius: '12px',
+                                                        fontSize: '0.85em',
+                                                        fontWeight: '600'
+                                                    }}>
+                                                        Out of Stock
+                                                    </span>
+                                                ) : (
+                                                    <span style={{ fontWeight: '600', color: p.stock < 10 ? '#f59e0b' : '#10b981' }}>
+                                                        {p.stock} units
+                                                    </span>
+                                                )}
+                                            </td>
                                             <td className="actions-cell">
                                                 <button onClick={() => { setEditingProduct(p); setNewProduct(p); setIsModalOpen(true); }}><Edit size={16} /></button>
                                                 <button className="del" onClick={() => deleteProduct(p._id || p.id)}><Trash2 size={16} /></button>
@@ -321,43 +403,100 @@ const AdminDashboard = () => {
                     <div className="admin-section animate-fade">
                         <div className="section-header">
                             <h2>{activeTab === 'ordered' ? 'Ordered Products' : 'Delivered Products'}</h2>
+                            {activeTab === 'delivered' && (
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <button
+                                        className={`filter-btn ${!deliveredFilter ? 'active' : ''}`}
+                                        onClick={() => setDeliveredFilter(null)}
+                                    >
+                                        All Delivered
+                                    </button>
+                                    <button
+                                        className={`filter-btn ${deliveredFilter === 'pos' ? 'active' : ''}`}
+                                        onClick={() => setDeliveredFilter('pos')}
+                                    >
+                                        POS Sales
+                                    </button>
+                                    <button
+                                        className={`filter-btn ${deliveredFilter === 'online' ? 'active' : ''}`}
+                                        onClick={() => setDeliveredFilter('online')}
+                                    >
+                                        Online Orders
+                                    </button>
+                                    <button
+                                        className={`filter-btn ${deliveredFilter === 'manual' ? 'active' : ''}`}
+                                        onClick={() => setDeliveredFilter('manual')}
+                                    >
+                                        Manual Orders
+                                    </button>
+                                </div>
+                            )}
                         </div>
                         <div className="admin-orders-list">
-                            {(activeTab === 'ordered' ? orderedOrders : deliveredOrders).map(order => (
-                                <div key={order._id || order.id} className="admin-order-card">
-                                    <div className="order-main-info">
-                                        <div className="order-id">
-                                            <span>Order ID</span>
-                                            <strong>#{order.tracking_id || (order._id || order.id).substring(0, 8)}</strong>
+                            {(activeTab === 'ordered' ? orderedOrders : deliveredOrders)
+                                .filter(order => {
+                                    // Filter delivered orders by source
+                                    if (activeTab === 'delivered' && deliveredFilter) {
+                                        if (deliveredFilter === 'pos') return order.source === 'pos';
+                                        if (deliveredFilter === 'manual') return order.source === 'manual' || (!order.source && order.order_status === 'delivered');
+                                        if (deliveredFilter === 'online') return order.source !== 'pos' && order.source !== 'manual';
+                                    }
+                                    return true;
+                                })
+                                .map(order => (
+                                    <div key={order._id || order.id} className="admin-order-card">
+                                        <div className="order-main-info">
+                                            <div className="order-id">
+                                                <span>Order ID</span>
+                                                <strong>#{order.tracking_id || (order._id || order.id).substring(0, 8)}</strong>
+                                            </div>
+                                            <div className="order-status-badge" data-status={order.order_status}>
+                                                {order.source === 'pos' ? (
+                                                    <span style={{
+                                                        display: 'inline-block',
+                                                        padding: '6px 16px',
+                                                        background: '#6366f1',
+                                                        color: 'white',
+                                                        borderRadius: '20px',
+                                                        fontSize: '0.9em',
+                                                        fontWeight: '700',
+                                                        textTransform: 'uppercase',
+                                                        letterSpacing: '0.5px'
+                                                    }}>
+                                                        📍 POS
+                                                    </span>
+                                                ) : (
+                                                    <select
+                                                        value={order.order_status || 'pending'}
+                                                        onChange={(e) => handleStatusUpdate(order._id || order.id, e.target.value)}
+                                                        className="status-select"
+                                                    >
+                                                        <option value="pending">Pending</option>
+                                                        <option value="shipped">Shipped</option>
+                                                        <option value="delivered">Delivered</option>
+                                                        <option value="cancelled">Cancelled</option>
+                                                    </select>
+                                                )}
+                                            </div>
                                         </div>
-                                        <div className="order-status-badge" data-status={order.order_status}>
-                                            <select
-                                                value={order.order_status || 'pending'}
-                                                onChange={(e) => handleStatusUpdate(order._id || order.id, e.target.value)}
-                                                className="status-select"
-                                            >
-                                                <option value="pending">Pending</option>
-                                                <option value="shipped">Shipped</option>
-                                                <option value="delivered">Delivered</option>
-                                                <option value="cancelled">Cancelled</option>
-                                            </select>
+                                        <div className="order-details">
+                                            <p><strong>Amount:</strong> {order.total_amount}tk</p>
+                                            <p><strong>Customer:</strong> {order.shipping_address?.name || 'Guest'}</p>
+                                            <p><strong>Address:</strong> {order.shipping_address?.address || 'N/A'}</p>
+                                        </div>
+                                        <div className="order-items-mini">
+                                            {order.items?.map((item, idx) => (
+                                                <span key={idx}>{item.name} (x{item.quantity})</span>
+                                            ))}
                                         </div>
                                     </div>
-                                    <div className="order-details">
-                                        <p><strong>Amount:</strong> {order.total_amount}tk</p>
-                                        <p><strong>Customer:</strong> {order.shipping_address?.name || 'Guest'}</p>
-                                        <p><strong>Address:</strong> {order.shipping_address?.address || 'N/A'}</p>
-                                    </div>
-                                    <div className="order-items-mini">
-                                        {order.items?.map((item, idx) => (
-                                            <span key={idx}>{item.name} (x{item.quantity})</span>
-                                        ))}
-                                    </div>
-                                </div>
-                            ))}
+                                ))}
                         </div>
                     </div>
                 )}
+
+
+                {activeTab === 'admins' && <AdminManagement />}
 
 
                 {activeTab === 'settings' && (
@@ -378,6 +517,10 @@ const AdminDashboard = () => {
                     </div>
                 )}
 
+                {activeTab === 'admins' && user?.is_super_admin && <AdminManagement />}
+
+                {activeTab === 'settings' && <POSSettings />}
+
                 {activeTab === 'manual-order' && <ManualOrder />}
                 {activeTab === 'pos' && <POS />}
             </main>
@@ -389,7 +532,14 @@ const AdminDashboard = () => {
                         <form onSubmit={handleAddOrUpdateProduct}>
                             <input placeholder="Name" value={newProduct.name} onChange={e => setNewProduct({ ...newProduct, name: e.target.value })} required />
                             <input placeholder="Price" value={newProduct.price} onChange={e => setNewProduct({ ...newProduct, price: e.target.value })} required />
-                            <input placeholder="Stock" type="number" value={newProduct.stock} onChange={e => setNewProduct({ ...newProduct, stock: e.target.value })} required />
+                            <input
+                                placeholder="Stock"
+                                type="number"
+                                value={newProduct.stock || 0}
+                                onChange={e => setNewProduct({ ...newProduct, stock: parseInt(e.target.value) || 0 })}
+                                required
+                                min="0"
+                            />
 
                             <select
                                 value={newProduct.category}
