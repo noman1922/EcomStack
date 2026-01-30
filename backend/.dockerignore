@@ -4,4 +4,3 @@ node_modules/
 storage/logs/*.log
 .git/
 Dockerfile
-docker/
