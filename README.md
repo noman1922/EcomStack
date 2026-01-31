@@ -201,7 +201,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 ## 👨‍💻 Author
 **Md. Abdullah Al Noman Khan**  
-*Computer Science & Engineering*  
+*Department of Computer Science & Engineering*  
 *IUBAT – International University of Business Agriculture and Technology*
 
 ---
