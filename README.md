@@ -205,4 +205,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 *IUBAT – International University of Business Agriculture and Technology*
 
 ---
-© 2026 EcomStack. All rights reserved.
+© 2026 EcomStack. All rights reserved. 
